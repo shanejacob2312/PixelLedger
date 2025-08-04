@@ -27,8 +27,8 @@ A revolutionary digital image authentication and ownership system that uses **se
                                 │
                                 ▼
                        ┌─────────────────┐    ┌─────────────────┐
-                       │ DCT Watermarking│───▶│ Blockchain Hash │
-                       │   (Mid-freq)    │    │   (web3.py)     │
+                       │ LSB Watermarking│───▶│ Blockchain Hash │
+                       │   (Blue Channel)│    │   (web3.py)     │
                        └─────────────────┘    └─────────────────┘
 ```
 
@@ -41,7 +41,7 @@ finalproj/
 │   │   ├── semantic.py          # Semantic feature extraction (BLIP + ResNet)
 │   │   ├── phash.py             # Perceptual hash functions
 │   │   ├── fingerprint.py       # Self-verifiable fingerprint creation
-│   │   ├── watermark.py         # DCT watermarking functions
+│   │   ├── lsb_watermark.py     # LSB watermarking functions
 │   │   └── pixel_ledger.py      # Main orchestrator
 │   ├── api/                     # API route definitions (future)
 │   ├── models/                  # Pydantic models/schemas (future)
@@ -79,7 +79,7 @@ finalproj/
 from app.core.pixel_ledger import PixelLedger
 
 # Initialize the system
-ledger = PixelLedger(watermark_strength=25.0)
+ledger = PixelLedger()
 
 # Metadata for the image
 metadata = {
@@ -94,7 +94,7 @@ metadata = {
 result = ledger.create_semantic_watermark(
     image_path="input_image.jpg",
     metadata=metadata,
-    output_path="watermarked_image.jpg"
+    output_path="watermarked_image.png"
 )
 
 if result["success"]:
@@ -108,7 +108,7 @@ if result["success"]:
 ```python
 # Verify the watermark
 verification = ledger.verify_semantic_watermark(
-    image_path="watermarked_image.jpg"
+    image_path="watermarked_image.png"
 )
 
 if verification["success"]:
@@ -133,10 +133,11 @@ if verification["success"]:
 - **Blockchain-Ready**: Generates payload for on-chain storage
 - **Drift Detection**: Compares original vs current semantic context
 
-### 4. DCT Watermarking (`watermark.py`)
-- **Mid-frequency Embedding**: Modifies DCT coefficients at position (5,5)
-- **YUV Color Space**: Embeds in luminance channel for better invisibility
+### 4. LSB Watermarking (`lsb_watermark.py`)
+- **Blue Channel Embedding**: Embeds in blue channel for better invisibility
+- **PNG Output**: Automatically saves as PNG to preserve watermark integrity
 - **Capacity Estimation**: Calculates maximum embeddable data size
+- **Robust Extraction**: Improved error handling and validation
 
 ### 5. PixelLedger Orchestrator (`pixel_ledger.py`)
 - **End-to-End Workflow**: Combines all components
@@ -149,7 +150,7 @@ if verification["success"]:
 - [x] Semantic context extraction (BLIP + ResNet)
 - [x] Perceptual hashing
 - [x] Self-verifiable fingerprint creation
-- [x] DCT-based watermark embedding/extraction
+- [x] LSB-based watermark embedding/extraction
 - [x] Semantic drift detection
 - [x] Blockchain-ready payload generation
 - [x] Comprehensive verification pipeline
@@ -181,11 +182,11 @@ This will show:
 1. **Extract Semantic Context**: BLIP generates caption, ResNet detects objects
 2. **Compute Perceptual Hash**: Create robust image fingerprint
 3. **Create Fingerprint**: Combine semantic + hash + metadata with multi-layer hashing
-4. **Embed Watermark**: Use DCT to embed fingerprint in mid-frequency coefficients
+4. **Embed Watermark**: Use LSB to embed fingerprint in blue channel
 5. **Generate Blockchain Payload**: Create hash for on-chain storage
 
 ### Verification Process
-1. **Extract Watermark**: Retrieve embedded fingerprint from DCT coefficients
+1. **Extract Watermark**: Retrieve embedded fingerprint from LSB
 2. **Verify Integrity**: Recompute all hashes and compare
 3. **Detect Drift**: Compare original vs current semantic context
 4. **Blockchain Verification**: Check against on-chain record (if available)
@@ -194,7 +195,8 @@ This will show:
 - **Multi-layer Hashing**: Prevents tampering at any level
 - **Semantic Drift Detection**: Catches content modifications
 - **Perceptual Hash**: Resistant to compression/resizing
-- **DCT Embedding**: Invisible to human eye
+- **LSB Embedding**: Invisible to human eye
+- **PNG Preservation**: Lossless format maintains watermark integrity
 - **Blockchain Binding**: Immutable ownership record
 
 ## 🤝 Contributing
@@ -213,7 +215,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 - **BLIP Model**: Salesforce for image captioning
 - **ResNet**: Microsoft Research for object detection
-- **DCT Watermarking**: Based on academic research in digital watermarking
+- **LSB Watermarking**: Based on academic research in digital watermarking
 - **Blockchain Integration**: Inspired by NFT and digital asset authentication systems
 
 ## 📞 Support

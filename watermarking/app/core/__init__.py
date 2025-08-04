@@ -1,15 +1,15 @@
-# Core modules for PixelLedger
+# Core module for PixelLedger watermarking system
 
 from .semantic import SemanticExtractor
 from .phash import compute_phash
 from .fingerprint import SemanticFingerprint
-from .watermark import DCTWatermarker
+from .lsb_watermark import LSBWatermarker
 from .pixel_ledger import PixelLedger
 
 __all__ = [
     'SemanticExtractor',
-    'compute_phash', 
+    'compute_phash',
     'SemanticFingerprint',
-    'DCTWatermarker',
-    'PixelLedger'
+    'LSBWatermarker',
+    'PixelLedger',
 ] 

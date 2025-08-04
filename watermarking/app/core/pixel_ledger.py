@@ -1,9 +1,10 @@
 import os
+import json
 from typing import Dict, Any, Optional, Tuple
 from .semantic import SemanticExtractor
 from .phash import compute_phash
 from .fingerprint import SemanticFingerprint
-from .watermark import DCTWatermarker
+from .lsb_watermark import LSBWatermarker
 
 class PixelLedger:
     """
@@ -13,20 +14,25 @@ class PixelLedger:
     - Semantic feature extraction (BLIP + ResNet)
     - Perceptual hashing
     - Self-verifiable fingerprint creation
-    - DCT-based watermark embedding/extraction
+    - LSB-based watermark embedding/extraction
     - Blockchain-ready payload generation
     """
     
-    def __init__(self, watermark_strength: float = 20.0):
+    def __init__(self, watermark_strength: float = 20.0, use_lsb: bool = True):
         """
         Initialize PixelLedger system
         
         Args:
-            watermark_strength: DCT watermark strength factor
+            watermark_strength: Watermark strength factor (for future use)
+            use_lsb: Use LSB watermarking (always True now)
         """
         self.semantic_extractor = SemanticExtractor()
         self.fingerprint_creator = SemanticFingerprint()
-        self.watermarker = DCTWatermarker(alpha=watermark_strength)
+        
+        # Always use LSB watermarking
+        self.watermarker = LSBWatermarker(channel=0)  # Use blue channel
+        self.watermark_method = "LSB"
+        print("✅ Using LSB watermarking (recommended for reliability)")
         
     def create_semantic_watermark(self, 
                                 image_path: str, 
@@ -69,8 +75,8 @@ class PixelLedger:
                 raise ValueError(f"Fingerprint too large. Capacity: {capacity} bits, needed: {len(fingerprint_bytes) * 8} bits")
             
             # Step 6: Embed watermark
-            print("Embedding semantic watermark...")
-            success = self.watermarker.embed_watermark_dct(
+            print(f"Embedding semantic watermark using {self.watermark_method}...")
+            success = self.watermarker.embed_watermark_lsb(
                 image_path=image_path,
                 watermark_data=fingerprint_bytes,
                 output_path=output_path
@@ -114,8 +120,8 @@ class PixelLedger:
         """
         try:
             # Step 1: Extract watermark
-            print("Extracting watermark...")
-            watermark_bytes = self.watermarker.extract_watermark_dct(image_path)
+            print(f"Extracting watermark using {self.watermark_method}...")
+            watermark_bytes = self.watermarker.extract_watermark_lsb(image_path)
             
             if watermark_bytes is None:
                 return {
@@ -124,8 +130,19 @@ class PixelLedger:
                 }
             
             # Step 2: Deserialize fingerprint
-            fingerprint_str = watermark_bytes.decode('utf-8')
-            fingerprint = self.fingerprint_creator.deserialize_fingerprint(fingerprint_str)
+            try:
+                watermark_str = watermark_bytes.decode('utf-8')
+                fingerprint = self.fingerprint_creator.deserialize_fingerprint(watermark_str)
+            except UnicodeDecodeError as e:
+                return {
+                    "success": False,
+                    "error": f"Failed to decode watermark data as UTF-8: {e}. This may indicate watermark corruption or extraction issues."
+                }
+            except json.JSONDecodeError as e:
+                return {
+                    "success": False,
+                    "error": f"Failed to parse watermark data as JSON: {e}. This may indicate watermark corruption or extraction issues."
+                }
             
             # Step 3: Verify fingerprint integrity
             print("Verifying fingerprint integrity...")
@@ -183,10 +200,10 @@ class PixelLedger:
                 "Semantic context extraction (BLIP + ResNet)",
                 "Perceptual hashing",
                 "Self-verifiable fingerprinting",
-                "DCT-based watermarking",
+                "LSB-based watermarking",
                 "Semantic drift detection",
                 "Blockchain-ready payloads"
             ],
-            "watermark_strength": self.watermarker.alpha,
-            "block_size": self.watermarker.block_size
+            "watermark_method": "LSB",
+            "channel": self.watermarker.channel
         } 

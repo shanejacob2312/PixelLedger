@@ -101,6 +101,79 @@ def display_image_selection():
             print(f"\n👋 Goodbye!")
             return None
 
+def collect_user_metadata(selected_image):
+    """Collect metadata from user input"""
+    print("\n📝 Please provide metadata for your watermarked image:")
+    print("=" * 50)
+    
+    # Ask if user wants to use defaults or input custom metadata
+    print("\n🤔 Metadata Input Options:")
+    print("   1. Use default metadata (quick start)")
+    print("   2. Input custom metadata (recommended)")
+    
+    while True:
+        choice = input("\n   Choose option (1 or 2): ").strip()
+        if choice in ['1', '2']:
+            break
+        print("   Please enter 1 or 2")
+    
+    if choice == '1':
+        # Use default metadata
+        from datetime import datetime
+        metadata = {
+            "author": "PixelLedger User",
+            "title": f"Watermarked: {selected_image['name']}",
+            "description": f"Semantic-aware watermarked image created with PixelLedger",
+            "creation_date": datetime.now().strftime("%Y-%m-%d"),
+            "copyright": f"© {datetime.now().year} PixelLedger. All rights reserved.",
+            "license": "CC BY-NC-ND 4.0",
+            "original_filename": selected_image['name'],
+            "original_filesize": selected_image['size'],
+            "watermarking_system": "PixelLedger v1.0",
+            "semantic_features": ["caption", "objects", "scenes", "perceptual_hash"]
+        }
+        print("   ✅ Using default metadata")
+        return metadata
+    
+    # Collect custom metadata
+    metadata = {}
+    
+    # Collect basic information
+    print("\n👤 Owner Information:")
+    metadata["owner_name"] = input("   Owner Name: ").strip() or "Unknown Owner"
+    metadata["author"] = input("   Author/Creator: ").strip() or metadata["owner_name"]
+    metadata["email"] = input("   Email (optional): ").strip() or ""
+    
+    print("\n📋 Image Details:")
+    metadata["title"] = input("   Image Title: ").strip() or f"Watermarked: {selected_image['name']}"
+    metadata["description"] = input("   Description (optional): ").strip() or f"Semantic-aware watermarked image created with PixelLedger"
+    
+    print("\n📅 Creation Information:")
+    from datetime import datetime
+    default_date = datetime.now().strftime("%Y-%m-%d")
+    metadata["creation_date"] = input(f"   Creation Date (YYYY-MM-DD) [default: {default_date}]: ").strip() or default_date
+    
+    print("\n⚖️ Legal Information:")
+    metadata["copyright"] = input("   Copyright Notice: ").strip() or f"© {datetime.now().year} {metadata['owner_name']}. All rights reserved."
+    metadata["license"] = input("   License (e.g., CC BY-NC-ND 4.0): ").strip() or "CC BY-NC-ND 4.0"
+    
+    print("\n🔧 Technical Information:")
+    metadata["watermarking_system"] = "PixelLedger v1.0"
+    metadata["original_filename"] = selected_image['name']
+    metadata["original_filesize"] = selected_image['size']
+    metadata["semantic_features"] = ["caption", "objects", "scenes", "perceptual_hash"]
+    
+    # Optional additional fields
+    print("\n📝 Additional Information (optional):")
+    metadata["keywords"] = input("   Keywords (comma-separated): ").strip() or ""
+    metadata["location"] = input("   Location (optional): ").strip() or ""
+    metadata["tags"] = input("   Tags (comma-separated): ").strip() or ""
+    
+    # Clean up empty fields
+    metadata = {k: v for k, v in metadata.items() if v}
+    
+    return metadata
+
 def open_image_in_viewer(image_path):
     """Open image in default system viewer"""
     try:
@@ -131,21 +204,18 @@ def run_comprehensive_test():
     print(f"\n🔧 Initializing PixelLedger system...")
     ledger = PixelLedger(watermark_strength=25.0)
     
-    # Step 3: Prepare metadata
-    metadata = {
-        "author": "PixelLedger User",
-        "title": f"Watermarked: {selected_image['name']}",
-        "description": f"Semantic-aware watermarked image created with PixelLedger",
-        "creation_date": "2024-01-15",
-        "copyright": "© 2024 PixelLedger. All rights reserved.",
-        "license": "CC BY-NC-ND 4.0",
-        "original_filename": selected_image['name'],
-        "original_filesize": selected_image['size'],
-        "watermarking_system": "PixelLedger v1.0",
-        "semantic_features": ["caption", "objects", "scenes", "perceptual_hash"]
-    }
+    # Step 3: Collect user metadata
+    metadata = collect_user_metadata(selected_image)
     
+    # Show metadata summary
     print_section("Input Metadata", metadata)
+    
+    # Ask for confirmation
+    print("\n🤔 Proceed with watermarking? (y/n): ", end="")
+    confirm = input().strip().lower()
+    if confirm not in ['y', 'yes', '']:
+        print("❌ Watermarking cancelled by user")
+        return
     
     try:
         # Step 4: Check watermark capacity
@@ -194,8 +264,11 @@ def run_comprehensive_test():
         })
         
         # Step 7: Create semantic watermark
-        print_section("Creating Semantic Watermark", "Embedding data using DCT...")
-        output_filename = f"watermarked_{selected_image['name']}"
+        print_section("Creating Semantic Watermark", "Embedding data using LSB...")
+        
+        # LSB watermarking always outputs PNG files, so we need to change the extension
+        base_name = os.path.splitext(selected_image['name'])[0]  # Remove original extension
+        output_filename = f"watermarked_{base_name}.png"  # Always use PNG extension
         output_path = os.path.join("images", output_filename)
         
         result = ledger.create_semantic_watermark(
@@ -285,7 +358,20 @@ def run_comprehensive_test():
                     "semantic_drift_detection": "✅ Detects content changes"
                 })
                 
-                # Step 12: Open watermarked image
+                # Step 12: Save metadata to JSON file
+                metadata_file = output_path.replace('.jpg', '_metadata.json').replace('.png', '_metadata.json').replace('.jpeg', '_metadata.json')
+                try:
+                    with open(metadata_file, 'w') as f:
+                        json.dump(metadata, f, indent=2)
+                    print_section("Metadata Saved", {
+                        "metadata_file": metadata_file,
+                        "metadata_fields": len(metadata),
+                        "status": "✅ Metadata saved for future reference"
+                    })
+                except Exception as e:
+                    print(f"⚠️ Warning: Could not save metadata file: {e}")
+                
+                # Step 13: Open watermarked image
                 print_section("Opening Watermarked Image", "Launching in default viewer...")
                 open_image_in_viewer(output_path)
                 
@@ -293,6 +379,7 @@ def run_comprehensive_test():
                     "status": "✅ SUCCESS",
                     "original_image": selected_image['name'],
                     "watermarked_image": output_filename,
+                    "metadata_file": os.path.basename(metadata_file),
                     "semantic_data_extracted": "✅",
                     "watermark_embedded": "✅",
                     "verification_passed": "✅",
