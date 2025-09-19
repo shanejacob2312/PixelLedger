@@ -46,3 +46,7 @@ dist/
 uploads/
 watermarked/
 static/
+
+# Large generated files
+watermarking/images/watermarked_*.png
+watermarking/images/watermarked_*.jpg
