@@ -19,9 +19,9 @@ const WatermarkVerify = () => {
         return;
       }
 
-      // Validate file size (max 10MB)
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error('File size must be less than 10MB');
+      // Validate file size (max 100MB)
+      if (file.size > 100 * 1024 * 1024) {
+        toast.error('File size must be less than 100MB');
         return;
       }
 
@@ -397,7 +397,7 @@ const WatermarkVerify = () => {
                     Drag and drop or click to select
                   </p>
                   <p className="text-sm text-gray-400 mt-2">
-                    Supports JPEG, PNG, BMP, TIFF, WebP (max 10MB)
+                    Supports JPEG, PNG, BMP, TIFF, WebP (max 100MB)
                   </p>
                 </div>
               </div>

@@ -1,0 +1,34 @@
+{
+  "name": "pixel-ledger",
+  "version": "1.0.0",
+  "description": "PixelLedger - Semantic-aware digital watermarking system",
+  "private": true,
+  "scripts": {
+    "start": "node start.js",
+    "start:frontend": "cd frontend && npm start",
+    "start:backend": "cd backend && python run_server.py",
+    "install:frontend": "cd frontend && npm install",
+    "install:backend": "cd backend && pip install -r requirements.txt",
+    "install:all": "npm run install:frontend && npm run install:backend",
+    "build": "cd frontend && npm run build",
+    "dev": "node start.js"
+  },
+  "keywords": [
+    "watermarking",
+    "digital-watermarking",
+    "semantic-aware",
+    "pixel-ledger",
+    "fastapi",
+    "react"
+  ],
+  "author": "PixelLedger Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/pixel-ledger.git"
+  }
+}
