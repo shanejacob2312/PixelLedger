@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watermark Image - PixelLedger</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5faf5;
+            color: #333;
+        }
+
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #2c3e50;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: #3498db;
+        }
+
+        .back-btn {
+            background: #3498db;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .back-btn:hover {
+            background: #2980b9;
+        }
+
+        .main-content {
+            margin-top: 80px;
+            padding: 2rem 0;
+            min-height: calc(100vh - 80px);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .page-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .form-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 3rem;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            padding: 1rem;
+            border: 2px dashed #3498db;
+            border-radius: 8px;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-input-label:hover {
+            background: #e3f2fd;
+            border-color: #2980b9;
+        }
+
+        .file-selected {
+            background: #e8f5e8;
+            border-color: #27ae60;
+            border-style: solid;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-primary:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #2c3e50;
+            border: 2px solid #2c3e50;
+            margin-right: 1rem;
+        }
+
+        .btn-secondary:hover {
+            background: #2c3e50;
+            color: white;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-error {
+            background: #fee;
+            color: #c0392b;
+            border: 1px solid #e74c3c;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .help-text {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        /* Image Preview Section */
+        .image-preview-section {
+            display: none;
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+            border: 2px solid #e1e8ed;
+        }
+
+        .image-preview-section.show {
+            display: block;
+        }
+
+        .preview-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .preview-header h3 {
+            color: #2c3e50;
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .preview-header p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .image-preview-container {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            border: 2px solid #3498db;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .preview-info {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e1e8ed;
+        }
+
+        .preview-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .preview-info-item {
+            background: #f8f9fa;
+            padding: 0.75rem;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .preview-info-item span {
+            display: block;
+            color: #666;
+            font-size: 0.8rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .preview-info-item strong {
+            color: #2c3e50;
+            font-size: 1rem;
+        }
+
+        .loading {
+            display: none;
+        }
+
+        .loading.show {
+            display: inline-block;
+        }
+
+        /* Success Section */
+        .success-section {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 3rem;
+            margin-top: 2rem;
+        }
+
+        .success-section.show {
+            display: block;
+        }
+
+        .success-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #27ae60;
+        }
+
+        .success-header h2 {
+            color: #27ae60;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 2rem;
+        }
+
+        .success-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .watermarked-preview {
+            width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+            border-radius: 8px;
+            border: 2px solid #e1e8ed;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+
+        .btn-info {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #2980b9;
+        }
+
+        .share-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .share-section h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .share-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .share-btn {
+            padding: 0.75rem;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: #2c3e50;
+        }
+
+        .share-btn:hover {
+            border-color: #3498db;
+            color: #3498db;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .metadata-info {
+            background: #e8f5e9;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border-left: 4px solid #27ae60;
+        }
+
+        .metadata-info h4 {
+            margin-bottom: 1rem;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .metadata-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .metadata-item {
+            background: white;
+            padding: 0.75rem;
+            border-radius: 6px;
+        }
+
+        .metadata-item span {
+            display: block;
+            color: #666;
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .metadata-item strong {
+            color: #2c3e50;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .form-container {
+                padding: 2rem;
+                margin: 0 1rem;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .success-section {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+
+            .success-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .share-options {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .metadata-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .watermarked-preview {
+                max-height: 300px;
+            }
+
+            .image-preview-section {
+                padding: 1rem;
+                margin: 1rem 0;
+            }
+
+            .preview-image {
+                max-height: 250px;
+            }
+
+            .preview-info-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="dashboard.html" class="logo">PixelLedger</a>
+            <nav class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="watermark.html" class="active">Watermark</a>
+                <a href="verify.html">Verify</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h1>Watermark Your Image</h1>
+                <p>Protect your digital artwork with invisible watermarking technology</p>
+            </div>
+
+            <div class="form-container">
+                <div id="alertContainer"></div>
+                
+                <form id="watermarkForm" enctype="multipart/form-data">
+                    <!-- Image Upload -->
+                    <div class="form-group">
+                        <label for="imageFile">
+                            Select Image <span class="required">*</span>
+                        </label>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="imageFile" name="image" accept="image/*" class="file-input" required>
+                            <label for="imageFile" class="file-input-label" id="fileLabel">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>Choose an image file to watermark</span>
+                            </label>
+                        </div>
+                        <div class="help-text">Supported formats: JPG, PNG, GIF, BMP, TIFF (Max 16MB)</div>
+                    </div>
+
+                    <!-- Image Preview Section -->
+                    <div id="imagePreviewSection" class="image-preview-section">
+                        <div class="preview-header">
+                            <h3>
+                                <i class="fas fa-eye"></i>
+                                Original Image Preview
+                            </h3>
+                            <p>This is the image that will be watermarked</p>
+                        </div>
+                        <div class="image-preview-container">
+                            <img id="previewImage" class="preview-image" alt="Image Preview">
+                            <div class="preview-info">
+                                <div class="preview-info-grid">
+                                    <div class="preview-info-item">
+                                        <span>Filename</span>
+                                        <strong id="previewFilename">-</strong>
+                                    </div>
+                                    <div class="preview-info-item">
+                                        <span>File Size</span>
+                                        <strong id="previewFilesize">-</strong>
+                                    </div>
+                                    <div class="preview-info-item">
+                                        <span>Dimensions</span>
+                                        <strong id="previewDimensions">-</strong>
+                                    </div>
+                                    <div class="preview-info-item">
+                                        <span>File Type</span>
+                                        <strong id="previewType">-</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <!-- Owner Information -->
+                        <div class="form-group">
+                            <label for="owner">
+                                Owner/Copyright Holder <span class="required">*</span>
+                            </label>
+                            <input type="text" id="owner" name="owner" class="form-control" required>
+                            <div class="help-text">Person or organization who owns the rights</div>
+                        </div>
+
+                        <!-- Creator Information -->
+                        <div class="form-group">
+                            <label for="creator">
+                                Creator/Artist <span class="required">*</span>
+                            </label>
+                            <input type="text" id="creator" name="creator" class="form-control" required>
+                            <div class="help-text">Original creator or artist of the work</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <!-- Creation Date -->
+                        <div class="form-group">
+                            <label for="dateCreated">
+                                Date Created <span class="required">*</span>
+                            </label>
+                            <input type="date" id="dateCreated" name="dateCreated" class="form-control" required>
+                        </div>
+
+                        <!-- Copyright Information -->
+                        <div class="form-group">
+                            <label for="copyright">Copyright Information</label>
+                            <input type="text" id="copyright" name="copyright" class="form-control" placeholder="e.g., All Rights Reserved, Creative Commons">
+                        </div>
+                    </div>
+
+                    <!-- Work Title -->
+                    <div class="form-group">
+                        <label for="title">
+                            Work Title <span class="required">*</span>
+                        </label>
+                        <input type="text" id="title" name="title" class="form-control" required placeholder="Enter the title of your artwork">
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description" rows="4" class="form-control" placeholder="Describe your artwork, medium, inspiration, etc."></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <!-- Medium -->
+                        <div class="form-group">
+                            <label for="medium">Medium</label>
+                            <select id="medium" name="medium" class="form-control">
+                                <option value="">Select Medium</option>
+                                <option value="Digital Art">Digital Art</option>
+                                <option value="Photography">Photography</option>
+                                <option value="Painting">Painting</option>
+                                <option value="Drawing">Drawing</option>
+                                <option value="Illustration">Illustration</option>
+                                <option value="Mixed Media">Mixed Media</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <!-- Category -->
+                        <div class="form-group">
+                            <label for="category">Category</label>
+                            <select id="category" name="category" class="form-control">
+                                <option value="">Select Category</option>
+                                <option value="Fine Art">Fine Art</option>
+                                <option value="Commercial">Commercial</option>
+                                <option value="Personal">Personal</option>
+                                <option value="Portfolio">Portfolio</option>
+                                <option value="Commission">Commission</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div style="margin-top: 3rem; display: flex; gap: 1rem;">
+                        <a href="dashboard.html" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </a>
+                        <button type="button" class="btn btn-primary" id="watermarkBtn">
+                            <span id="btnText">Watermark Image</span>
+                            <i class="fas fa-spinner fa-spin loading" id="loadingSpinner"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Success Section (appears after watermark creation) -->
+            <div id="successSection" class="success-section">
+                <div class="success-header">
+                    <h2>
+                        <i class="fas fa-check-circle"></i>
+                        Watermark Created Successfully!
+                    </h2>
+                    <p>Your image has been invisibly watermarked with your ownership details</p>
+                </div>
+
+                <div style="text-align: center; margin-bottom: 1rem;">
+                    <h3 style="color: #2c3e50; font-size: 1.2rem; margin-bottom: 0.5rem;">
+                        <i class="fas fa-image"></i> Your Watermarked Image
+                    </h3>
+                    <p style="color: #666; font-size: 0.9rem;">
+                        The watermark is invisible to the eye but permanently embedded in the image
+                    </p>
+                </div>
+
+                <img id="watermarkedPreview" class="watermarked-preview" alt="Watermarked Image">
+
+                <!-- AI Semantic Analysis (Stored but not embedded) -->
+                <div id="semanticAnalysis" style="display: none; background: #e3f2fd; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; border-left: 4px solid #2196F3;">
+                    <h4 style="color: #1976d2; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-brain"></i> AI Semantic Analysis
+                    </h4>
+                    <p style="color: #1565c0; font-size: 0.95rem; margin-bottom: 0.5rem; font-style: italic;" id="aiCaption"></p>
+                    <p style="color: #666; font-size: 0.85rem; margin-top: 0.5rem;">
+                        <strong>Detected Objects:</strong> <span id="aiObjects"></span>
+                    </p>
+                </div>
+
+                <div class="metadata-info">
+                    <h4><i class="fas fa-lock"></i> Embedded Watermark Data</h4>
+                    <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
+                        The following information is <strong>permanently embedded</strong> inside the image pixels and can be extracted for verification
+                    </p>
+                    <div class="metadata-grid" id="metadataContent"></div>
+                </div>
+                
+                <!-- Hash Information -->
+                <div id="hashInformation" style="display: none; background: #fff3e0; padding: 1.5rem; border-radius: 8px; margin-top: 2rem; border-left: 4px solid #ff9800;">
+                    <h4 style="color: #e65100; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-fingerprint"></i> Cryptographic Hashes (Embedded in Image)
+                    </h4>
+                    <div style="font-family: monospace; font-size: 0.85rem;" id="hashContent"></div>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="button" class="btn btn-success" onclick="downloadWatermarkedImage()">
+                        <i class="fas fa-download"></i> Download Image
+                    </button>
+                    <button type="button" class="btn btn-warning" onclick="resetForm()">
+                        <i class="fas fa-redo"></i> Create Another
+                    </button>
+                    <a href="dashboard.html" class="btn btn-info">
+                        <i class="fas fa-th-large"></i> Go to Dashboard
+                    </a>
+                </div>
+
+                <div class="share-section">
+                    <h3><i class="fas fa-share-alt"></i> Share Your Watermarked Image</h3>
+                    <div class="share-options">
+                        <button type="button" class="share-btn" onclick="copyImageToClipboard()">
+                            <i class="fas fa-copy"></i> Copy Image
+                        </button>
+                        <button type="button" class="share-btn" onclick="shareOnTwitter()">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </button>
+                        <button type="button" class="share-btn" onclick="shareOnFacebook()">
+                            <i class="fab fa-facebook"></i> Facebook
+                        </button>
+                        <button type="button" class="share-btn" onclick="shareViaEmail()">
+                            <i class="fas fa-envelope"></i> Email
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000/api';
+
+        // Helper function to get auth headers
+        function getAuthHeaders() {
+            const token = localStorage.getItem('pixelledger_token');
+            const headers = {};
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            return headers;
+        }
+
+        // Track if form is being processed to prevent auth check interruptions
+        let isProcessingWatermark = false;
+
+        // PAGE UNLOAD DETECTOR - Find what's causing the reset
+        window.addEventListener('beforeunload', (e) => {
+            console.error('🚨 PAGE IS ABOUT TO UNLOAD!');
+            console.error('Stack trace:', new Error().stack);
+            console.error('isProcessingWatermark:', isProcessingWatermark);
+        });
+
+        // Check authentication on page load
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('pixelledger_token');
+            const user = localStorage.getItem('pixelledger_user');
+            
+            console.log('[AUTH CHECK] Page loaded - checking authentication...');
+            console.log('[AUTH CHECK] token:', token ? 'exists' : 'missing');
+            console.log('[AUTH CHECK] user:', user ? 'exists' : 'missing');
+            console.log('[AUTH CHECK] isProcessingWatermark:', isProcessingWatermark);
+            
+            if (!token || !user) {
+                if (isProcessingWatermark) {
+                    console.log('[AUTH CHECK] Skipping redirect - watermark in progress');
+                    return;
+                }
+                console.log('[AUTH CHECK] No token found, redirecting to login');
+                alert('Please login to access the watermarking tool');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            try {
+                const userData = JSON.parse(user);
+                console.log('[AUTH CHECK] User authenticated:', userData.username);
+                console.log('[AUTH CHECK] Using JWT token for API authentication');
+                
+                // Pre-fill owner field with user's name
+                const ownerField = document.getElementById('owner');
+                if (ownerField && userData.full_name) {
+                    ownerField.value = userData.full_name;
+                } else if (ownerField && userData.username) {
+                    ownerField.value = userData.username;
+                }
+                
+                // Set default date
+                document.getElementById('dateCreated').value = new Date().toISOString().split('T')[0];
+            } catch (error) {
+                console.error('[AUTH CHECK] Error loading user data:', error);
+                if (!isProcessingWatermark) {
+                    console.log('[AUTH CHECK] Invalid user data, redirecting to login');
+                window.location.href = 'login.html';
+                }
+            }
+        });
+
+        // File input handling with preview
+        document.getElementById('imageFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const label = document.getElementById('fileLabel');
+            const previewSection = document.getElementById('imagePreviewSection');
+            
+            if (file) {
+                // Update file label
+                label.innerHTML = `
+                    <i class="fas fa-check-circle"></i>
+                    <span>Selected: ${file.name}</span>
+                `;
+                label.classList.add('file-selected');
+                
+                // Show preview section
+                showImagePreview(file);
+            } else {
+                // Reset label
+                label.innerHTML = `
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span>Choose an image file to watermark</span>
+                `;
+                label.classList.remove('file-selected');
+                
+                // Hide preview
+                previewSection.classList.remove('show');
+            }
+        });
+
+        // Show image preview
+        function showImagePreview(file) {
+            const previewSection = document.getElementById('imagePreviewSection');
+            const previewImage = document.getElementById('previewImage');
+            const previewFilename = document.getElementById('previewFilename');
+            const previewFilesize = document.getElementById('previewFilesize');
+            const previewDimensions = document.getElementById('previewDimensions');
+            const previewType = document.getElementById('previewType');
+            
+            // Read file
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                // Set preview image
+                previewImage.src = e.target.result;
+                
+                // Get image dimensions
+                const img = new Image();
+                img.onload = function() {
+                    previewDimensions.textContent = `${this.width} × ${this.height} px`;
+                };
+                img.src = e.target.result;
+                
+                // Set file info
+                previewFilename.textContent = file.name;
+                previewFilesize.textContent = formatFileSize(file.size);
+                previewType.textContent = file.type.split('/')[1].toUpperCase();
+                
+                // Show preview section with animation
+                previewSection.classList.add('show');
+                
+                // Scroll to preview
+                setTimeout(() => {
+                    previewSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 100);
+            };
+            
+            reader.readAsDataURL(file);
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        // Show alert function
+        function showAlert(message, type = 'error') {
+            const container = document.getElementById('alertContainer');
+            container.innerHTML = `
+                <div class="alert alert-${type}">
+                    ${message}
+                </div>
+            `;
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    container.innerHTML = '';
+                }, 5000);
+            }
+        }
+
+        // Store watermarked image data globally
+        let currentWatermarkedImage = null;
+        let currentImageMetadata = null;
+
+        // Handle watermark submission - COMPLETELY REWRITTEN
+        async function handleWatermarkSubmit(event) {
+            // CRITICAL: Stop ALL event propagation immediately
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                event.stopImmediatePropagation();
+            }
+            
+            console.log('[FORM] ═══════════════════════════════════════════════════');
+            console.log('[FORM] WATERMARK PROCESS STARTED');
+            console.log('[FORM] ═══════════════════════════════════════════════════');
+            
+            isProcessingWatermark = true;
+            
+            const btn = document.getElementById('watermarkBtn');
+            const btnText = document.getElementById('btnText');
+            const spinner = document.getElementById('loadingSpinner');
+            const form = document.getElementById('watermarkForm');
+            
+            // Validate form first
+            if (!form.checkValidity()) {
+                console.log('[FORM] Validation failed');
+                form.reportValidity();
+                isProcessingWatermark = false;
+                return false;
+            }
+            
+            // Show loading state
+            btn.disabled = true;
+            btnText.style.display = 'none';
+            spinner.classList.add('show');
+            
+            try {
+                const formData = new FormData(form);
+                
+                // Convert file to base64
+                const fileInput = document.getElementById('imageFile');
+                if (!fileInput.files[0]) {
+                    throw new Error('No file selected');
+                }
+                
+                const file = fileInput.files[0];
+                console.log('[FORM] Converting file to base64:', file.name);
+                const base64 = await fileToBase64(file);
+                formData.set('image', base64);
+                
+                // Get auth headers
+                const headers = getAuthHeaders();
+                delete headers['Content-Type'];
+                
+                console.log('[FORM] Sending request to backend...');
+                const response = await fetch(`${API_BASE_URL}/watermark/embed`, {
+                    method: 'POST',
+                    headers: headers,
+                    credentials: 'include',
+                    body: formData
+                });
+                
+                console.log('[FORM] Response status:', response.status);
+                const result = await response.json();
+                console.log('[FORM] Response received, keys:', Object.keys(result));
+                
+                if (response.ok) {
+                    console.log('[FORM] ✅ SUCCESS - Storing data...');
+                    
+                    currentWatermarkedImage = result.watermarked_image;
+                    currentImageMetadata = result.metadata;
+                    
+                    console.log('[FORM] ✅ Data stored');
+                    console.log('[FORM] Watermarked image length:', result.watermarked_image ? result.watermarked_image.length : 'MISSING');
+                    
+                    // Show the success section properly instead of alert
+                    console.log('[FORM] Calling showSuccessSection...');
+                    showSuccessSection(result);
+                    console.log('[FORM] showSuccessSection completed');
+                    
+                    console.log('[FORM] ═══════════════════════════════════════════════════');
+                    console.log('[FORM] ✅ ALERT CLOSED - CONTINUING...');
+                    console.log('[FORM] About to set isProcessingWatermark to false');
+                    console.log('[FORM] ═══════════════════════════════════════════════════');
+                    
+                    isProcessingWatermark = false;
+                    console.log('[FORM] isProcessingWatermark is now:', isProcessingWatermark);
+                } else {
+                    console.error('[FORM] ❌ Backend error:', result.error);
+                    showAlert(result.error || 'Watermarking failed');
+                    isProcessingWatermark = false;
+                }
+            } catch (error) {
+                console.error('[FORM] ❌ Exception:', error.message);
+                console.error('[FORM] Stack:', error.stack);
+                showAlert('Error: ' + error.message);
+                isProcessingWatermark = false;
+            } finally {
+                console.log('[FORM] In finally block - resetting button state');
+                // Reset button state
+                btn.disabled = false;
+                btnText.style.display = 'inline';
+                spinner.classList.remove('show');
+                console.log('[FORM] Button state reset complete');
+            }
+            
+            console.log('[FORM] ═══════════════════════════════════════════════════');
+            console.log('[FORM] About to return false from handleWatermarkSubmit');
+            console.log('[FORM] ═══════════════════════════════════════════════════');
+            
+            // CRITICAL: Prevent any form submission
+            return false;
+        }
+        
+        // Add button click handler
+        document.getElementById('watermarkBtn').addEventListener('click', (e) => {
+            console.log('[FORM] Button clicked');
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            handleWatermarkSubmit(e);
+            return false;
+        });
+        
+        // Prevent form submission - MORE AGGRESSIVE
+        document.getElementById('watermarkForm').addEventListener('submit', (e) => {
+            console.log('[FORM] ⚠️ Form submit event fired - BLOCKING IT');
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            handleWatermarkSubmit(e);
+            return false;
+        }, true); // Use capture phase
+
+        // Show success section with watermarked image
+        function showSuccessSection(result) {
+            console.log('[SUCCESS] showSuccessSection called');
+            console.log('[SUCCESS] Result keys:', Object.keys(result));
+            
+            try {
+                console.log('[SUCCESS] Finding DOM elements...');
+                const formContainer = document.querySelector('.form-container');
+                const successSection = document.getElementById('successSection');
+                const preview = document.getElementById('watermarkedPreview');
+                const metadataContent = document.getElementById('metadataContent');
+                const semanticAnalysis = document.getElementById('semanticAnalysis');
+                const hashInformation = document.getElementById('hashInformation');
+                
+                console.log('[SUCCESS] Form container:', !!formContainer);
+                console.log('[SUCCESS] Success section:', !!successSection);
+                console.log('[SUCCESS] Preview:', !!preview);
+                
+                if (!formContainer || !successSection || !preview) {
+                    console.error('[SUCCESS] ERROR: Required DOM elements not found!');
+                    alert('Error: Cannot display results - missing page elements');
+                    return;
+                }
+
+                // Set watermarked image preview
+                console.log('[SUCCESS] Setting watermarked image...');
+                if (!result.watermarked_image) {
+                    console.error('[SUCCESS] ERROR: No watermarked_image in result!');
+                    throw new Error('Backend did not return watermarked image data');
+                }
+                preview.src = 'data:image/png;base64,' + result.watermarked_image;
+                console.log('[SUCCESS] Watermarked preview image set');
+                
+                // Show AI Semantic Analysis if available
+                if (result.semantic_features && result.semantic_features.caption && 
+                    result.semantic_features.caption !== 'Caption generation unavailable') {
+                    
+                    // Using textContent (safe from XSS) instead of innerHTML
+                    document.getElementById('aiCaption').textContent = 
+                        `"${result.semantic_features.caption}"`;
+                    
+                    if (result.semantic_features.objects && result.semantic_features.objects.length > 0) {
+                        const objectsList = result.semantic_features.objects
+                            .map(obj => `${escapeHtml(obj.class)} (${obj.confidence}%)`)
+                            .join(', ');
+                        document.getElementById('aiObjects').textContent = objectsList;
+                    }
+                    
+                    semanticAnalysis.style.display = 'block';
+                }
+                
+                // Show Hash Information if available
+                if (result.semantic_features || result.fingerprint) {
+                    let hashHTML = '';
+                    
+                    if (result.semantic_features && result.semantic_features.semantic_hash) {
+                        hashHTML += `
+                            <div style="margin-bottom: 1rem; padding: 0.75rem; background: white; border-radius: 6px;">
+                                <div style="color: #666; font-size: 0.8rem; margin-bottom: 0.25rem;">Semantic Hash (embedded):</div>
+                                <div style="color: #e65100; font-weight: bold; word-break: break-all;">${escapeHtml(result.semantic_features.semantic_hash)}</div>
+                            </div>
+                        `;
+                    }
+                    
+                    if (result.fingerprint && result.fingerprint.perceptual_hash) {
+                        hashHTML += `
+                            <div style="margin-bottom: 1rem; padding: 0.75rem; background: white; border-radius: 6px;">
+                                <div style="color: #666; font-size: 0.8rem; margin-bottom: 0.25rem;">Perceptual Hash (embedded):</div>
+                                <div style="color: #e65100; font-weight: bold; word-break: break-all;">${escapeHtml(result.fingerprint.perceptual_hash)}</div>
+                            </div>
+                        `;
+                    }
+                    
+                    if (result.fingerprint && result.fingerprint.master_fingerprint) {
+                        hashHTML += `
+                            <div style="margin-bottom: 1rem; padding: 0.75rem; background: white; border-radius: 6px;">
+                                <div style="color: #666; font-size: 0.8rem; margin-bottom: 0.25rem;">Master Fingerprint (embedded first 32 chars):</div>
+                                <div style="color: #e65100; font-weight: bold; word-break: break-all;">${escapeHtml(result.fingerprint.master_fingerprint.substring(0, 32))}</div>
+                            </div>
+                        `;
+                        
+                        hashHTML += `
+                            <div style="padding: 0.75rem; background: white; border-radius: 6px;">
+                                <div style="color: #666; font-size: 0.8rem; margin-bottom: 0.25rem;">Full Master Fingerprint (for blockchain):</div>
+                                <div style="color: #666; font-size: 0.7rem; word-break: break-all;">${escapeHtml(result.fingerprint.master_fingerprint)}</div>
+                            </div>
+                        `;
+                    }
+                    
+                    document.getElementById('hashContent').innerHTML = hashHTML;
+                    hashInformation.style.display = 'block';
+                }
+                
+                // Get form values for complete display
+                const formData = {
+                    owner: document.getElementById('owner').value,
+                    creator: document.getElementById('creator').value,
+                    dateCreated: document.getElementById('dateCreated').value,
+                    copyright: document.getElementById('copyright').value,
+                    title: document.getElementById('title').value,
+                    description: document.getElementById('description').value,
+                    medium: document.getElementById('medium').value,
+                    category: document.getElementById('category').value
+                };
+                
+                // Display complete metadata in grid
+                let metadataHTML = `
+                <div class="metadata-item">
+                    <span>Work Title</span>
+                    <strong>${escapeHtml(formData.title) || 'N/A'}</strong>
+                </div>
+                <div class="metadata-item">
+                    <span>Owner/Copyright Holder</span>
+                    <strong>${escapeHtml(formData.owner) || 'N/A'}</strong>
+                </div>
+                <div class="metadata-item">
+                    <span>Creator/Artist</span>
+                    <strong>${escapeHtml(formData.creator) || 'N/A'}</strong>
+                </div>
+                <div class="metadata-item">
+                    <span>Date Created</span>
+                    <strong>${escapeHtml(formData.dateCreated) || 'N/A'}</strong>
+                </div>
+                `;
+                
+                // Add optional fields if they have values
+                if (formData.copyright) {
+                    metadataHTML += `
+                        <div class="metadata-item">
+                            <span>Copyright Information</span>
+                            <strong>${escapeHtml(formData.copyright)}</strong>
+                        </div>
+                    `;
+                }
+                
+                if (formData.medium) {
+                    metadataHTML += `
+                        <div class="metadata-item">
+                            <span>Medium</span>
+                            <strong>${escapeHtml(formData.medium)}</strong>
+                        </div>
+                    `;
+                }
+                
+                if (formData.category) {
+                    metadataHTML += `
+                        <div class="metadata-item">
+                            <span>Category</span>
+                            <strong>${escapeHtml(formData.category)}</strong>
+                        </div>
+                    `;
+                }
+                
+                // Add technical details
+                metadataHTML += `
+                    <div class="metadata-item">
+                        <span>Image Quality (PSNR)</span>
+                        <strong>${result.psnr ? result.psnr.toFixed(2) + ' dB' : 'N/A'}</strong>
+                    </div>
+                `;
+                
+                // Add description as a full-width item if it exists
+                if (formData.description) {
+                    metadataHTML += `
+                        <div class="metadata-item" style="grid-column: 1 / -1;">
+                            <span>Description</span>
+                            <strong style="white-space: pre-wrap;">${escapeHtml(formData.description)}</strong>
+                        </div>
+                    `;
+                }
+                
+                metadataContent.innerHTML = metadataHTML;
+                
+                console.log('[SUCCESS] Metadata HTML set');
+                console.log('[SUCCESS] About to hide form and show success section...');
+                
+                // Hide form and show success section
+                formContainer.style.display = 'none';
+                console.log('[SUCCESS] Form container hidden');
+                
+                successSection.classList.add('show');
+                console.log('[SUCCESS] Success section shown');
+                
+                // Scroll to success section
+                setTimeout(() => {
+                    successSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    console.log('[SUCCESS] ✅ Scrolled to success section');
+                }, 100);
+                
+                console.log('[SUCCESS] ✅✅✅ showSuccessSection COMPLETE - RETURNING TO CALLER ✅✅✅');
+                
+            } catch (error) {
+                console.error('[SUCCESS] ❌❌❌ ERROR in showSuccessSection:', error);
+                console.error('[SUCCESS] Error stack:', error.stack);
+                console.error('[SUCCESS] This error will cause page reset!');
+                alert('Error displaying results: ' + error.message);
+                throw error; // Re-throw to see in caller
+            }
+        }
+
+        // Download watermarked image
+        function downloadWatermarkedImage() {
+            console.log('[DOWNLOAD] Download button clicked');
+            
+            if (!currentWatermarkedImage) {
+                console.error('[DOWNLOAD] No watermarked image data available');
+                alert('No watermarked image available to download');
+                return;
+            }
+            
+            try {
+                console.log('[DOWNLOAD] Creating download link...');
+                // Create download link
+                const link = document.createElement('a');
+                link.href = 'data:image/png;base64,' + currentWatermarkedImage;
+                link.download = 'watermarked_' + new Date().getTime() + '.png';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                console.log('[DOWNLOAD] ✅ Image downloaded successfully!');
+            } catch (error) {
+                console.error('[DOWNLOAD] ❌ Download failed:', error);
+                alert('Download failed: ' + error.message);
+            }
+        }
+
+        // Reset form to create another watermark
+        function resetForm() {
+            const formContainer = document.querySelector('.form-container');
+            const successSection = document.getElementById('successSection');
+            const previewSection = document.getElementById('imagePreviewSection');
+            
+            // Hide success section and show form
+            successSection.classList.remove('show');
+            formContainer.style.display = 'block';
+            
+            // Hide image preview
+            previewSection.classList.remove('show');
+            
+            // Reset form
+            document.getElementById('watermarkForm').reset();
+            document.getElementById('fileLabel').innerHTML = `
+                <i class="fas fa-cloud-upload-alt"></i>
+                <span>Choose an image file to watermark</span>
+            `;
+            document.getElementById('fileLabel').classList.remove('file-selected');
+            document.getElementById('dateCreated').value = new Date().toISOString().split('T')[0];
+            
+            // Clear alert
+            document.getElementById('alertContainer').innerHTML = '';
+            
+            // Pre-fill owner field
+            const user = localStorage.getItem('pixelledger_user');
+            if (user) {
+            const userData = JSON.parse(user);
+                const ownerField = document.getElementById('owner');
+                if (ownerField && userData.full_name) {
+                    ownerField.value = userData.full_name;
+                } else if (ownerField && userData.username) {
+                    ownerField.value = userData.username;
+                }
+            }
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Copy image to clipboard
+        async function copyImageToClipboard() {
+            if (!currentWatermarkedImage) return;
+            
+            try {
+                // Convert base64 to blob
+                const response = await fetch('data:image/png;base64,' + currentWatermarkedImage);
+                const blob = await response.blob();
+                
+                // Copy to clipboard
+                await navigator.clipboard.write([
+                    new ClipboardItem({ 'image/png': blob })
+                ]);
+                
+                console.log('Image copied to clipboard!');
+                alert('Image copied to clipboard!'); // Simple alert for feedback
+            } catch (error) {
+                console.error('Clipboard error:', error);
+                alert('Failed to copy image to clipboard. Your browser may not support this feature.');
+            }
+        }
+
+        // Share on Twitter
+        function shareOnTwitter() {
+            const text = currentImageMetadata ? 
+                `Check out my watermarked image created with PixelLedger! Owner: ${currentImageMetadata.owner}` :
+                'Check out my watermarked image created with PixelLedger!';
+            
+            const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank', 'width=550,height=420');
+        }
+
+        // Share on Facebook
+        function shareOnFacebook() {
+            const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
+            window.open(url, '_blank', 'width=550,height=420');
+        }
+
+        // Share via Email
+        function shareViaEmail() {
+            const subject = 'Watermarked Image from PixelLedger';
+            const body = currentImageMetadata ? 
+                `I've created a watermarked image using PixelLedger!\n\nOwner: ${currentImageMetadata.owner}\nCreator: ${currentImageMetadata.creator}\nDate: ${currentImageMetadata.date_created}` :
+                'I\'ve created a watermarked image using PixelLedger!';
+            
+            const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.location.href = mailtoLink;
+        }
+
+        // Utility function to convert file to base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // Utility function to escape HTML to prevent XSS
+        function escapeHtml(text) {
+            if (!text) return text;
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

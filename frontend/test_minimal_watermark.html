@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Minimal Watermark Test - No Redirects</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f5f5f5; }
+        .section { background: white; padding: 20px; margin: 10px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        button { padding: 12px 24px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:disabled { background: #95a5a6; cursor: not-allowed; }
+        button:hover:not(:disabled) { background: #2980b9; }
+        input[type="file"] { margin: 10px 0; }
+        .hide { display: none !important; }
+        .show { display: block !important; }
+        img { max-width: 500px; margin: 15px 0; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        .log { font-family: 'Courier New', monospace; font-size: 13px; background: #2c3e50; color: #ecf0f1; padding: 8px; margin: 3px 0; border-radius: 4px; }
+        .log.error { background: #e74c3c; color: white; font-weight: bold; }
+        .log.success { background: #27ae60; color: white; }
+        .log.warning { background: #f39c12; color: white; }
+        h1 { color: #2c3e50; }
+        h2 { color: #34495e; margin-top: 0; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 4px; font-weight: bold; }
+        .status.ok { background: #d4edda; color: #155724; }
+        .status.fail { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>🔬 Minimal Watermark Test (Zero Redirects)</h1>
+    
+    <div class="section">
+        <h2>Step 1: Login</h2>
+        <button onclick="doLogin()" id="loginBtn">Create Test User & Login</button>
+        <div id="loginStatus"></div>
+    </div>
+
+    <div class="section" id="uploadSection" class="hide">
+        <h2>Step 2: Upload & Watermark</h2>
+        <!-- NO FORM TAG - Just plain elements -->
+        <div>
+            <label>Select Image:</label><br>
+            <input type="file" id="imageFile" accept="image/*">
+        </div>
+        <br>
+        <button onclick="doWatermark()" id="watermarkBtn">Watermark Image</button>
+    </div>
+
+    <div class="section hide" id="successSection">
+        <h2>✅ Success!</h2>
+        <p>Watermark created successfully. Page did NOT reset!</p>
+        <img id="watermarkedImage" alt="Watermarked Image">
+        <br><br>
+        <button onclick="resetTest()">Test Again</button>
+    </div>
+
+    <div class="section">
+        <h2>📋 Debug Log</h2>
+        <button onclick="clearLog()">Clear Log</button>
+        <div id="logContainer"></div>
+    </div>
+
+    <script>
+        const API = 'http://localhost:5000/api';
+        let logCount = 0;
+
+        // CRITICAL: Monitor for ANY navigation attempts
+        const originalLocationSetter = Object.getOwnPropertyDescriptor(window.location, 'href').set;
+        Object.defineProperty(window.location, 'href', {
+            set: function(value) {
+                log(`⚠️⚠️⚠️ REDIRECT ATTEMPT BLOCKED: ${value}`, 'error');
+                console.trace('Redirect attempt from:');
+                // Don't actually navigate - for debugging
+                // originalLocationSetter.call(window.location, value);
+            }
+        });
+
+        // Monitor beforeunload
+        window.addEventListener('beforeunload', (e) => {
+            log('⚠️⚠️⚠️ PAGE UNLOAD DETECTED!', 'error');
+            console.error('PAGE IS ABOUT TO RESET!');
+        });
+
+        function log(msg, type = 'info') {
+            logCount++;
+            const div = document.createElement('div');
+            div.className = `log ${type}`;
+            div.textContent = `[${logCount}] ${new Date().toLocaleTimeString()}.${new Date().getMilliseconds()} - ${msg}`;
+            const container = document.getElementById('logContainer');
+            container.insertBefore(div, container.firstChild);
+            console.log(`[${type.toUpperCase()}] ${msg}`);
+        }
+
+        function clearLog() {
+            document.getElementById('logContainer').innerHTML = '';
+            logCount = 0;
+        }
+
+        async function doLogin() {
+            log('🚀 Starting login...');
+            const btn = document.getElementById('loginBtn');
+            btn.disabled = true;
+
+            try {
+                const timestamp = Date.now();
+                const user = {
+                    username: `test${timestamp}`,
+                    email: `test${timestamp}@test.com`,
+                    password: 'Test123!',
+                    full_name: 'Test User'
+                };
+
+                log(`Creating user: ${user.username}`);
+                
+                // Register
+                let response = await fetch(`${API}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(user)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Registration failed: ${response.status}`);
+                }
+                
+                log('✅ User registered', 'success');
+
+                // Login
+                response = await fetch(`${API}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        username: user.username,
+                        password: user.password
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Login failed: ${response.status}`);
+                }
+
+                const result = await response.json();
+                log('✅ Login successful', 'success');
+                log(`Session created, cookies set`);
+
+                document.getElementById('loginStatus').innerHTML = 
+                    `<div class="status ok">✅ Logged in as ${user.username}</div>`;
+                
+                document.getElementById('uploadSection').classList.remove('hide');
+                
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+                document.getElementById('loginStatus').innerHTML = 
+                    `<div class="status fail">❌ ${error.message}</div>`;
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function doWatermark() {
+            log('🎨 Starting watermark process...');
+            
+            const fileInput = document.getElementById('imageFile');
+            const btn = document.getElementById('watermarkBtn');
+
+            if (!fileInput.files[0]) {
+                log('❌ No file selected', 'error');
+                alert('Please select an image file first');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Processing...';
+
+            try {
+                const file = fileInput.files[0];
+                log(`📁 File: ${file.name} (${file.size} bytes)`);
+
+                // Convert to base64
+                log('🔄 Converting to base64...');
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+                log('✅ Conversion complete');
+
+                // Prepare form data
+                const formData = new FormData();
+                formData.append('image', base64);
+                formData.append('owner', 'Test Owner');
+                formData.append('creator', 'Test Creator');
+                formData.append('dateCreated', new Date().toISOString().split('T')[0]);
+                formData.append('title', 'Test Watermark');
+                formData.append('description', 'Minimal test');
+                formData.append('copyright', '© 2025');
+                formData.append('medium', 'Photography');
+                formData.append('category', 'Fine Art');
+
+                log('📤 Sending request to backend...');
+                const response = await fetch(`${API}/watermark/embed`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    body: formData
+                });
+
+                log(`📥 Response: ${response.status} ${response.statusText}`);
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || `HTTP ${response.status}`);
+                }
+
+                const result = await response.json();
+                log('✅ Watermark successful!', 'success');
+                log(`   Image ID: ${result.image_id}`);
+                log(`   PSNR: ${result.psnr} dB`);
+
+                // Display result
+                log('🖼️ Displaying watermarked image...');
+                const img = document.getElementById('watermarkedImage');
+                img.src = 'data:image/png;base64,' + result.watermarked_image;
+                
+                document.getElementById('uploadSection').classList.add('hide');
+                document.getElementById('successSection').classList.remove('hide');
+
+                log('✅✅✅ COMPLETE - NO PAGE RESET!', 'success');
+
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+                alert(`Error: ${error.message}`);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Watermark Image';
+            }
+        }
+
+        function resetTest() {
+            log('🔄 Resetting test...');
+            document.getElementById('successSection').classList.add('hide');
+            document.getElementById('uploadSection').classList.remove('hide');
+            document.getElementById('imageFile').value = '';
+            log('✅ Ready for another test');
+        }
+
+        log('✅ Page loaded and ready', 'success');
+        log('⚡ All redirects are BLOCKED for debugging');
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Isolated Watermark Test</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .section { background: #f0f0f0; padding: 15px; margin: 10px 0; border-radius: 8px; }
+        button { padding: 10px 20px; margin: 5px; background: #3498db; color: white; border: none; cursor: pointer; border-radius: 4px; }
+        button:disabled { background: #95a5a6; }
+        .form-section { display: block; }
+        .form-section.hide { display: none; }
+        .success-section { display: none; background: #d4edda; padding: 20px; border-radius: 8px; }
+        .success-section.show { display: block; }
+        img { max-width: 400px; margin: 10px 0; }
+        .log { font-family: monospace; font-size: 12px; background: #fff; padding: 5px; margin: 2px 0; }
+        .error { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Isolated Watermark Test</h1>
+    
+    <div class="section">
+        <h3>Instructions:</h3>
+        <ol>
+            <li>Make sure backend is running</li>
+            <li>Login first using button below</li>
+            <li>Upload image and click Watermark</li>
+            <li>Watch console and logs below</li>
+        </ol>
+        <button onclick="quickLogin()">Quick Login (Create Test User)</button>
+        <div id="loginStatus"></div>
+    </div>
+
+    <div id="formSection" class="form-section">
+        <div class="section">
+            <h3>Upload & Watermark</h3>
+            <form id="watermarkForm">
+                <input type="file" id="imageFile" accept="image/*" required><br><br>
+                <input type="text" placeholder="Owner" value="Test Owner" required><br><br>
+                <input type="text" placeholder="Creator" value="Test Creator" required><br><br>
+                <input type="date" id="dateCreated" required><br><br>
+                <input type="text" placeholder="Title" value="Test Title" required><br><br>
+                
+                <button type="button" id="watermarkBtn" onclick="handleWatermark(event)">
+                    <span id="btnText">Watermark Image</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="successSection" class="success-section">
+        <h3>✅ Success!</h3>
+        <p>Watermarked image:</p>
+        <img id="watermarkedImg">
+        <br>
+        <button onclick="resetForm()">Create Another</button>
+    </div>
+
+    <div class="section">
+        <h3>📊 Event Log:</h3>
+        <button onclick="document.getElementById('eventLog').innerHTML=''">Clear Log</button>
+        <div id="eventLog"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        let logCounter = 0;
+
+        function log(msg, isError = false) {
+            logCounter++;
+            const div = document.createElement('div');
+            div.className = 'log' + (isError ? ' error' : '');
+            div.textContent = `[${logCounter}] ${new Date().toLocaleTimeString()}: ${msg}`;
+            document.getElementById('eventLog').insertBefore(div, document.getElementById('eventLog').firstChild);
+            console.log(msg);
+        }
+
+        // Monitor page unload
+        window.addEventListener('beforeunload', (e) => {
+            log('⚠️⚠️⚠️ PAGE ABOUT TO UNLOAD/RESET! ⚠️⚠️⚠️', true);
+            console.error('PAGE RESET DETECTED!');
+        });
+
+        // Set date
+        document.getElementById('dateCreated').value = new Date().toISOString().split('T')[0];
+
+        async function quickLogin() {
+            log('Creating test user and logging in...');
+            const timestamp = Date.now();
+            const userData = {
+                username: `test_${timestamp}`,
+                email: `test_${timestamp}@test.com`,
+                password: 'Test123!',
+                full_name: 'Test User'
+            };
+
+            try {
+                // Register
+                let response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+                
+                if (response.ok) {
+                    log('✅ User registered');
+                    
+                    // Login
+                    response = await fetch(`${API_BASE}/auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify({
+                            username: userData.username,
+                            password: userData.password
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        log('✅ Login successful');
+                        document.getElementById('loginStatus').innerHTML = 
+                            `<div style="color: green;">✅ Logged in as ${userData.username}</div>`;
+                    } else {
+                        log('❌ Login failed', true);
+                    }
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, true);
+            }
+        }
+
+        async function handleWatermark(event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            log('🚀 Watermark button clicked');
+            
+            const form = document.getElementById('watermarkForm');
+            const btn = document.getElementById('watermarkBtn');
+            
+            if (!form.checkValidity()) {
+                log('❌ Form validation failed', true);
+                form.reportValidity();
+                return false;
+            }
+            
+            log('✅ Form is valid');
+            btn.disabled = true;
+            btn.textContent = 'Processing...';
+            
+            try {
+                const formData = new FormData(form);
+                const fileInput = document.getElementById('imageFile');
+                
+                if (!fileInput.files[0]) {
+                    throw new Error('No file selected');
+                }
+                
+                log(`📁 Converting file: ${fileInput.files[0].name}`);
+                const base64 = await fileToBase64(fileInput.files[0]);
+                formData.set('image', base64);
+                
+                log('📤 Sending request to backend...');
+                const response = await fetch(`${API_BASE}/watermark/embed`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    body: formData
+                });
+                
+                log(`📥 Response status: ${response.status}`);
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    log('✅ Watermark successful!');
+                    log(`   Image ID: ${result.image_id}`);
+                    log(`   PSNR: ${result.psnr} dB`);
+                    
+                    // Show success
+                    log('🎨 Displaying success section...');
+                    document.getElementById('watermarkedImg').src = 
+                        'data:image/png;base64,' + result.watermarked_image;
+                    
+                    document.getElementById('formSection').classList.add('hide');
+                    log('   Form hidden');
+                    
+                    document.getElementById('successSection').classList.add('show');
+                    log('   Success shown');
+                    
+                    log('✅✅✅ COMPLETE - NO RESET! ✅✅✅');
+                } else {
+                    log(`❌ Backend error: ${result.error}`, true);
+                }
+                
+            } catch (error) {
+                log(`❌ Exception: ${error.message}`, true);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Watermark Image';
+                log('🔄 Button re-enabled');
+            }
+            
+            return false;
+        }
+
+        function resetForm() {
+            log('🔄 Reset clicked');
+            document.getElementById('formSection').classList.remove('hide');
+            document.getElementById('successSection').classList.remove('show');
+            document.getElementById('watermarkForm').reset();
+            document.getElementById('dateCreated').value = new Date().toISOString().split('T')[0];
+            log('✅ Reset complete');
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // Prevent form submit
+        document.getElementById('watermarkForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            log('⚠️ Form submit event intercepted');
+            handleWatermark(e);
+            return false;
+        });
+
+        log('✅ Page loaded - ready for testing');
+    </script>
+</body>
+</html>
+

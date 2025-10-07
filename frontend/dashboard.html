@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - PixelLedger</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5faf5;
+            color: #333;
+        }
+
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+        }
+
+        .logout-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #ff5252;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 6rem 2rem 2rem;
+        }
+
+        .welcome-section {
+            background: url('images/herosection.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: white;
+            padding: 3rem;
+            border-radius: 20px;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .welcome-section h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .welcome-section p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .action-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .action-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .watermark-icon {
+            color: #667eea;
+        }
+
+        .verify-icon {
+            color: #3498db;
+        }
+
+        .action-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        .action-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .stats-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 3rem;
+        }
+
+        .stats-section h2 {
+            margin-bottom: 2rem;
+            color: #2c3e50;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .recent-images {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .recent-images h2 {
+            margin-bottom: 2rem;
+            color: #2c3e50;
+        }
+
+        .images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .image-card {
+            border: 1px solid #e1e8ed;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .image-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-preview {
+            width: 100%;
+            height: 150px;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+
+        .image-info {
+            padding: 1rem;
+        }
+
+        .image-info h4 {
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+
+        .image-info p {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .image-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #cbd5e0;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .modal-header h3 {
+            color: #2c3e50;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .alert-success {
+            background: #f0fff4;
+            color: #2f855a;
+            border: 1px solid #9ae6b4;
+        }
+
+        .alert-error {
+            background: #fee;
+            color: #c53030;
+            border: 1px solid #feb2b2;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 5rem 1rem 2rem;
+            }
+
+            .header-content {
+                padding: 0 1rem;
+            }
+
+            .welcome-section {
+                padding: 2rem;
+            }
+
+            .welcome-section h1 {
+                font-size: 2rem;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="#" class="logo">PixelLedger</a>
+            <div class="user-menu">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="userName">Loading...</span>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Welcome Section -->
+        <section class="welcome-section">
+            <h1>Welcome to PixelLedger</h1>
+            <p>Protect your digital images with advanced invisible watermarking technology</p>
+            <div class="quick-actions">
+                <a href="watermark.html" class="action-card">
+                    <div class="action-icon watermark-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Watermark Image</h3>
+                    <p>Embed invisible watermarks into your images to protect ownership and add metadata</p>
+                </a>
+                <div class="action-card" onclick="openVerifyModal()">
+                    <div class="action-icon verify-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>Verify Watermark</h3>
+                    <p>Check if an image contains watermarks and extract embedded ownership information</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="stats-section">
+            <h2>Your Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalImages">0</div>
+                    <div class="stat-label">Watermarked Images</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="successfulVerifications">0</div>
+                    <div class="stat-label">Successful Verifications</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="totalVerifications">0</div>
+                    <div class="stat-label">Total Verifications</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="averagePSNR">0</div>
+                    <div class="stat-label">Average PSNR (dB)</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Images -->
+        <section class="recent-images">
+            <h2>Recent Watermarked Images</h2>
+            <div class="images-grid" id="imagesGrid">
+                <div class="empty-state">
+                    <i class="fas fa-images"></i>
+                    <h3>No watermarked images yet</h3>
+                    <p>Start by watermarking your first image</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+
+    <!-- Verify Modal -->
+    <div id="verifyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Verify Watermark</h3>
+                <button class="close-btn" onclick="closeVerifyModal()">&times;</button>
+            </div>
+            <form id="verifyForm" enctype="multipart/form-data">
+                <div id="verifyAlert"></div>
+                
+                <div class="form-group">
+                    <label for="verifyImageFile">Select Image to Verify</label>
+                    <input type="file" id="verifyImageFile" name="image" accept="image/*" required class="form-control">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <span id="verifyBtnText">Verify Watermark</span>
+                    <i class="fas fa-spinner fa-spin" id="verifySpinner" style="display: none;"></i>
+                </button>
+            </form>
+
+            <div id="verifyResults" style="display: none; margin-top: 2rem;">
+                <h4>Verification Results</h4>
+                <div id="verifyResultsContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000/api';
+        
+        // Prevent multiple simultaneous requests
+        let isLoading = false;
+
+        // Get auth headers (moved before usage)
+        function getAuthHeaders() {
+            const token = localStorage.getItem('pixelledger_token');
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            
+            return headers;
+        }
+
+        // Show alert function
+        function showAlert(containerId, message, type = 'error') {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `
+                <div class="alert alert-${type}">
+                    ${message}
+                </div>
+            `;
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    container.innerHTML = '';
+                }, 5000);
+            }
+        }
+
+        // Check authentication on page load
+        window.addEventListener('load', async () => {
+            if (isLoading) return;
+            isLoading = true;
+            
+            try {
+                // First check if user is authenticated
+                const isAuthenticated = localStorage.getItem('pixelledger_authenticated');
+                const user = localStorage.getItem('pixelledger_user');
+
+                if (!isAuthenticated || !user) {
+                    console.log('Not authenticated, redirecting to login');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const userData = JSON.parse(user);
+                console.log('User data loaded:', userData);
+                
+                // Update display name
+                document.getElementById('userName').textContent = userData.full_name || userData.username;
+                
+                // Verify session is still valid by calling profile endpoint
+                const response = await fetch(`${API_BASE_URL}/auth/profile`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: getAuthHeaders()
+                });
+
+                if (!response.ok) {
+                    console.warn('Session verification failed, but using local user data');
+                    // Don't redirect immediately - let user continue with local data
+                } else {
+                    const profileData = await response.json();
+                    const freshUserData = profileData.user;
+                    
+                    // Update display name with fresh data
+                    document.getElementById('userName').textContent = freshUserData.full_name || freshUserData.username;
+                    
+                    // Update localStorage with fresh data
+                    localStorage.setItem('pixelledger_user', JSON.stringify(freshUserData));
+                }
+                
+                // Set default date (only if element exists)
+                const dateElement = document.getElementById('dateCreated');
+                if (dateElement) {
+                    dateElement.value = new Date().toISOString().split('T')[0];
+                }
+                
+                // Load user data
+                loadUserStats();
+                loadUserImages();
+                
+            } catch (error) {
+                console.error('Error in page load:', error);
+            } finally {
+                isLoading = false;
+            }
+        });
+
+        // Load user statistics
+        async function loadUserStats() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/stats`, {
+                    method: 'GET',
+                    headers: getAuthHeaders(),
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const stats = await response.json();
+                    const totalImagesEl = document.getElementById('totalImages');
+                    const successfulVerificationsEl = document.getElementById('successfulVerifications');
+                    const totalVerificationsEl = document.getElementById('totalVerifications');
+                    const averagePSNREl = document.getElementById('averagePSNR');
+                    
+                    if (totalImagesEl) totalImagesEl.textContent = stats.total_images || 0;
+                    if (successfulVerificationsEl) successfulVerificationsEl.textContent = stats.successful_verifications || 0;
+                    if (totalVerificationsEl) totalVerificationsEl.textContent = stats.total_verifications || 0;
+                    if (averagePSNREl) averagePSNREl.textContent = stats.average_psnr || 0;
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Load user images
+        async function loadUserImages() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/images`, {
+                    method: 'GET',
+                    headers: getAuthHeaders(),
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displayImages(data.images);
+                }
+            } catch (error) {
+                console.error('Error loading images:', error);
+            }
+        }
+
+        // Display images in grid
+        function displayImages(images) {
+            const imagesGrid = document.getElementById('imagesGrid');
+            
+            if (images.length === 0) {
+                imagesGrid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-images"></i>
+                        <h3>No watermarked images yet</h3>
+                        <p>Start by watermarking your first image</p>
+                    </div>
+                `;
+                return;
+            }
+
+            imagesGrid.innerHTML = images.map(image => `
+                <div class="image-card">
+                    <div class="image-preview">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <div class="image-info">
+                        <h4>${image.owner_name}</h4>
+                        <p><strong>Creator:</strong> ${image.creator_name}</p>
+                        <p><strong>Date:</strong> ${new Date(image.date_created).toLocaleDateString()}</p>
+                        <p><strong>PSNR:</strong> ${image.psnr.toFixed(2)} dB</p>
+                        <div class="image-actions">
+                            <a href="${API_BASE_URL}/images/${image.image_id}/download" class="btn btn-primary">
+                                <i class="fas fa-download"></i> Download
+                            </a>
+                            <button class="btn btn-secondary" onclick="viewImageDetails('${image.image_id}')">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Modal functions
+
+        function openVerifyModal() {
+            document.getElementById('verifyModal').style.display = 'block';
+        }
+
+        function closeVerifyModal() {
+            document.getElementById('verifyModal').style.display = 'none';
+            document.getElementById('verifyForm').reset();
+            document.getElementById('verifyAlert').innerHTML = '';
+            document.getElementById('verifyResults').style.display = 'none';
+        }
+
+
+        // Verify form submission
+        document.getElementById('verifyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('verifyBtnText');
+            const spinner = document.getElementById('verifySpinner');
+            
+            submitBtn.style.display = 'none';
+            spinner.style.display = 'inline-block';
+            
+            try {
+                const formData = new FormData(e.target);
+                const fileInput = document.getElementById('verifyImageFile');
+                
+                if (!fileInput.files[0]) {
+                    showAlert('verifyAlert', 'Please select an image file.');
+                    return;
+                }
+
+                // Convert file to base64
+                const file = fileInput.files[0];
+                const base64 = await fileToBase64(file);
+                
+                // Add base64 to form data
+                formData.set('image', base64);
+                
+                const response = await fetch(`${API_BASE_URL}/watermark/verify`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    displayVerifyResults(result);
+                    showAlert('verifyAlert', `Verification completed. ${result.matches_found} match(es) found.`, 'success');
+                } else {
+                    showAlert('verifyAlert', result.error || 'Verification failed.');
+                }
+            } catch (error) {
+                console.error('Verify error:', error);
+                showAlert('verifyAlert', 'Network error. Please try again.');
+            } finally {
+                submitBtn.style.display = 'inline';
+                spinner.style.display = 'none';
+            }
+        });
+
+        // Display verification results
+        function displayVerifyResults(result) {
+            const resultsDiv = document.getElementById('verifyResults');
+            const contentDiv = document.getElementById('verifyResultsContent');
+            
+            if (result.matches_found === 0) {
+                contentDiv.innerHTML = `
+                    <div class="alert alert-error">
+                        <h4><i class="fas fa-times-circle"></i> No watermarks found</h4>
+                        <p>This image does not contain any watermarks from our database.</p>
+                    </div>
+                `;
+            } else {
+                contentDiv.innerHTML = result.results.map(match => {
+                    let html = `
+                        <div class="alert alert-success" style="max-width: 100%; overflow: hidden;">
+                            <h4><i class="fas fa-check-circle"></i> Watermark Found & Verified!</h4>
+                            
+                            <div style="border-bottom: 2px solid #c3e6cb; margin: 1rem 0; padding-bottom: 1rem;">
+                                <h5 style="color: #155724; margin-bottom: 0.5rem;">📋 Ownership Information (Extracted from Image)</h5>
+                                <p><strong>Owner:</strong> ${match.extraction_results.payload_data.owner || 'N/A'}</p>
+                                <p><strong>Creator:</strong> ${match.image_record.creator_name || 'N/A'}</p>
+                                <p><strong>Date Created:</strong> ${match.extraction_results.payload_data.date_created || 'N/A'}</p>
+                                <p><strong>Copyright:</strong> ${match.image_record.copyright_info || 'N/A'}</p>
+                                <p><strong>Description:</strong> ${match.image_record.description || 'N/A'}</p>
+                            </div>
+                    `;
+                    
+                    // Add AI Semantic Analysis if available
+                    if (match.semantic_features && match.semantic_features.caption) {
+                        html += `
+                            <div style="background: #e3f2fd; padding: 1rem; border-radius: 6px; margin: 1rem 0; border-left: 4px solid #2196F3;">
+                                <h5 style="color: #1976d2; margin-bottom: 0.5rem;"><i class="fas fa-brain"></i> AI Semantic Analysis</h5>
+                                <p style="font-style: italic; color: #1565c0; margin-bottom: 0.5rem;">"${match.semantic_features.caption}"</p>
+                                ${match.semantic_features.objects && match.semantic_features.objects.length > 0 ? 
+                                    `<p style="font-size: 0.9rem; color: #666;">
+                                        <strong>Detected:</strong> ${match.semantic_features.objects.map(obj => `${obj.class} (${obj.confidence}%)`).join(', ')}
+                                    </p>` : ''}
+                            </div>
+                        `;
+                    }
+                    
+                    // Add Extracted Hashes (from image)
+                    if (match.fingerprint) {
+                        html += `
+                            <div style="background: #fff3e0; padding: 1rem; border-radius: 6px; margin: 1rem 0; border-left: 4px solid #ff9800;">
+                                <h5 style="color: #e65100; margin-bottom: 0.5rem;"><i class="fas fa-fingerprint"></i> Extracted Hashes (from Image)</h5>
+                        `;
+                        
+                        if (match.semantic_features && match.semantic_features.semantic_hash) {
+                            html += `
+                                <p style="font-family: monospace; font-size: 0.85rem; margin-bottom: 0.5rem;">
+                                    <strong>Semantic Hash:</strong><br>
+                                    <span style="color: #e65100;">${match.semantic_features.semantic_hash}</span>
+                                </p>
+                            `;
+                        }
+                        
+                        if (match.fingerprint.perceptual_hash) {
+                            html += `
+                                <p style="font-family: monospace; font-size: 0.85rem; margin-bottom: 0.5rem;">
+                                    <strong>Perceptual Hash:</strong><br>
+                                    <span style="color: #e65100;">${match.fingerprint.perceptual_hash}</span>
+                                </p>
+                            `;
+                        }
+                        
+                        if (match.fingerprint.master_fingerprint) {
+                            html += `
+                                <p style="font-family: monospace; font-size: 0.75rem; word-break: break-all;">
+                                    <strong>Master Fingerprint:</strong><br>
+                                    <span style="color: #666;">${match.fingerprint.master_fingerprint}</span>
+                                </p>
+                            `;
+                        }
+                        
+                        html += `</div>`;
+                    }
+                    
+                    // Add verification metrics
+                    html += `
+                        <div style="border-top: 2px solid #c3e6cb; margin-top: 1rem; padding-top: 1rem;">
+                            <h5 style="color: #155724; margin-bottom: 0.5rem;">🔬 Verification Metrics</h5>
+                            <p><strong>Correlation Score:</strong> ${match.extraction_results.avg_correlation.toFixed(3)}</p>
+                            <p><strong>Bit Error Rate:</strong> ${(match.extraction_results.bit_error_rate * 100).toFixed(2)}%</p>
+                            <p><strong>Confidence:</strong> <span style="color: ${match.extraction_results.avg_correlation > 0.8 ? '#2e7d32' : '#f57c00'};">
+                                ${match.extraction_results.avg_correlation > 0.8 ? 'HIGH ✓' : 'MEDIUM ⚠'}
+                            </span></p>
+                        </div>
+                    `;
+                    
+                    html += `</div>`;
+                    return html;
+                }).join('');
+            }
+            
+            resultsDiv.style.display = 'block';
+        }
+
+        // Utility function to convert file to base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // Logout function
+        async function logout() {
+            try {
+                await fetch(`${API_BASE_URL}/auth/logout`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: getAuthHeaders()
+                });
+            } catch (error) {
+                console.error('Logout error:', error);
+            } finally {
+                // Clear all authentication data
+                localStorage.removeItem('pixelledger_user');
+                localStorage.removeItem('pixelledger_token');
+                localStorage.removeItem('pixelledger_authenticated');
+                console.log('Logged out successfully');
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Close modals when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
