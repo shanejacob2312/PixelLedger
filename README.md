@@ -1,15 +1,23 @@
+
 # PixelLedger - Advanced Invisible Watermarking System
 
-PixelLedger is a comprehensive invisible watermarking system that uses advanced DWT (Discrete Wavelet Transform) techniques, spread-spectrum embedding, and geometric correction to protect digital images with invisible watermarks.
+PixelLedger is a comprehensive invisible watermarking system that uses advanced DWT (Discrete Wavelet Transform) techniques, AI-powered semantic analysis, and cryptographic fingerprinting to protect digital images with invisible watermarks.
 
 ## Features
 
 ### Core Watermarking Technology
-- **DWT-based Embedding**: Uses 2-level Discrete Wavelet Transform with Daubechies-4 wavelets
-- **Spread-Spectrum Technique**: Pseudo-random patterns with 100x replication for robustness
-- **Synchronization Template**: Automatic geometric correction for rotation, scaling, and translation
-- **Error-Correcting Codes**: BCH(255,127) codes for reliable data recovery
+- **DWT-based Embedding**: Uses 2-level Discrete Wavelet Transform with Haar wavelets
+- **Quantization-based Technique**: Robust coefficient modification for reliable embedding
 - **High Image Quality**: Maintains PSNR ≥ 35 dB while embedding watermarks
+- **Geometric Robustness**: Resistant to rotation, scaling, cropping, and compression
+
+### Semantic Watermarking (AI-Powered)
+- **BLIP Caption Generation**: AI-generated natural language descriptions of image content
+- **ResNet Object Detection**: Top-5 object/scene classification with confidence scores
+- **Semantic Hash Creation**: SHA256 hash of semantic content for tamper detection
+- **Perceptual Hashing**: Visual fingerprint resistant to compression/resizing
+- **Multi-Layer Fingerprinting**: H(image), H(metadata), H(features), H(fingerprint)
+- **Blockchain-Ready Payload**: Essential verification data prepared for on-chain storage
 
 ### Future Blockchain Integration (v2.0)
 - **Cryptographic Hash Storage**: Watermark metadata hashes stored on blockchain
@@ -27,134 +35,185 @@ PixelLedger is a comprehensive invisible watermarking system that uses advanced 
 - Combined attacks
 
 ### Web Application Features
-- User authentication and profile management
-- Image upload and watermark embedding
-- Watermark verification and metadata extraction
-- Dashboard with statistics and image management
-- Responsive design for desktop and mobile
+- **User Authentication**: Secure JWT-based authentication with session management
+- **Watermark Embedding**: Upload images and embed invisible watermarks with metadata
+- **Semantic Analysis Display**: View AI-generated captions and detected objects
+- **Cryptographic Hashes**: View embedded semantic, perceptual, and master fingerprint hashes
+- **Watermark Verification**: Upload any image to detect and extract watermarks
+- **Tamper Detection**: Identify if watermarked images have been modified
+- **Dashboard**: Statistics, image gallery, and recent activity
+- **Responsive Design**: Works seamlessly on desktop and mobile devices
 
 ## System Architecture
 
 ```
 PixelLedger/
-├── backend/                 # Backend API and watermarking engine
-│   ├── watermark_embed.py   # Watermark embedding module
-│   ├── watermark_extract.py # Watermark extraction with geometric correction
-│   ├── watermark_test.py    # Attack simulation and evaluation
-│   └── app.py              # Flask REST API server
-├── frontend/               # Web application frontend
-│   ├── index.html          # Landing page
-│   ├── login.html          # User login
-│   ├── signup.html         # User registration
-│   └── dashboard.html      # Main application dashboard
-├── demo.ipynb              # Interactive demonstration notebook
-├── requirements.txt        # Python dependencies
-└── README.md              # This file
+├── backend/                          # Backend API and watermarking engine
+│   ├── app.py                        # Flask REST API server with MongoDB
+│   ├── watermark_final_working.py    # Core DWT watermarking system
+│   ├── semantic_watermark.py         # AI-powered semantic watermarking
+│   └── flask_session/                # Session storage
+├── frontend/                         # Web application frontend
+│   ├── index.html                    # Landing page
+│   ├── login.html                    # User login
+│   ├── signup.html                   # User registration
+│   ├── dashboard.html                # Main dashboard with stats
+│   ├── watermark.html                # Watermark embedding interface
+│   ├── verify.html                   # Watermark verification interface
+│   └── images/                       # UI assets
+├── test_images/                      # Test images and results
+│   ├── original/                     # Original test images
+│   ├── watermarked/                  # Watermarked outputs
+│   └── attacked/                     # Attack simulation results
+├── requirements.txt                  # Python dependencies
+├── BLOCKCHAIN_ROADMAP.md             # Blockchain integration plan
+└── README.md                         # This file
 ```
 
 ## Installation
 
 ### Prerequisites
 - Python 3.8 or higher
+- MongoDB (local or MongoDB Atlas)
 - Modern web browser
-- 4GB RAM minimum (8GB recommended)
+- 4GB RAM minimum (8GB recommended for AI features)
 
-### Backend Setup
+### Quick Start
 
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd pixelledgerdwt
+   cd pixledgerdwt
    ```
 
-2. **Create virtual environment**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-3. **Install dependencies**
+2. **Install dependencies**
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Initialize database**
+3. **Configure MongoDB**
+   - Install MongoDB locally, OR
+   - Update `MONGODB_URI` in `backend/app.py` with your MongoDB Atlas connection string
+
+4. **Launch Backend Server**
    ```bash
    cd backend
    python app.py
    ```
-   The database will be created automatically on first run.
-
-5. **Start the backend server**
-   ```bash
-   python app.py
-   ```
    The API will be available at `http://localhost:5000`
 
-### Frontend Setup
+5. **Launch Frontend Server**
+   
+   **Option 1: Python HTTP Server (Recommended - No auto-refresh issues)**
+   ```bash
+   cd frontend
+   python -m http.server 8080
+   ```
+   Then visit `http://localhost:8080`
 
-1. **Open the frontend**
-   - Navigate to the `frontend/` directory
-   - Open `index.html` in your web browser
-   - Or serve it using a local web server:
-     ```bash
-     cd frontend
-     python -m http.server 8080
-     ```
-     Then visit `http://localhost:8080`
+   **Option 2: Live Server (VS Code Extension)**
+   - Install Live Server extension in VS Code
+   - Right-click `frontend/index.html` → "Open with Live Server"
+   - Visit `http://localhost:5500`
+   
+   **Note:** If using Live Server, disable auto-refresh to prevent interruptions during watermarking.
+
+6. **Access the Application**
+   - Landing Page: `http://localhost:8080/index.html`
+   - Sign Up: `http://localhost:8080/signup.html`
+   - Login: `http://localhost:8080/login.html`
+   - Dashboard: `http://localhost:8080/dashboard.html` (after login)
+   - Watermark: `http://localhost:8080/watermark.html` (after login)
+   - Verify: `http://localhost:8080/verify.html` (after login)
 
 ## Usage
 
-### Web Application
+### Web Application Workflow
 
-1. **Landing Page**: Visit the homepage to learn about PixelLedger's features
-2. **Registration**: Create a new account with username, email, and password
-3. **Login**: Sign in to access the dashboard
-4. **Watermark Images**: 
-   - Upload an image
-   - Fill in metadata (owner, creator, copyright, etc.)
-   - Download the watermarked image
-5. **Verify Watermarks**: Upload any image to check for embedded watermarks
+1. **Registration & Login**
+   - Create account at `/signup.html`
+   - Login at `/login.html`
+   - JWT token stored in localStorage for authentication
+
+2. **Watermark Images** (`/watermark.html`)
+   - Upload an image (PNG, JPG, JPEG - max 16MB)
+   - Fill in metadata:
+     - Owner/Copyright Holder (required)
+     - Creator/Artist (required)
+     - Date Created (required)
+     - Work Title (required)
+     - Copyright Information (optional)
+     - Description, Medium, Category (optional)
+   - AI Analysis automatically generates:
+     - Natural language caption (BLIP)
+     - Object detection with confidence scores (ResNet)
+     - Semantic hash for content verification
+     - Perceptual hash for visual fingerprint
+     - Master fingerprint for blockchain
+   - View embedded data and cryptographic hashes
+   - Download watermarked image
+   - Share on social media or copy to clipboard
+
+3. **Verify Watermarks** (`/verify.html`)
+   - Upload any image to check for watermarks
+   - Three possible results:
+     - ✅ **Watermark Verified**: Shows all embedded metadata, AI analysis, and hashes
+     - ⚠️ **Image Tampered**: Watermark detected but image was modified
+     - ❌ **No Watermark**: No watermark detected in image
+   - View database record matches
+   - See semantic features and fingerprints
+
+4. **Dashboard** (`/dashboard.html`)
+   - View statistics (images watermarked, verifications performed)
+   - Browse watermarked images gallery
+   - Quick access to watermark and verify tools
 
 ### Python API
 
 ```python
-from backend.watermark_embed import WatermarkEmbedder
-from backend.watermark_extract import WatermarkExtractor
+from backend.semantic_watermark import SemanticWatermarkSystem
+import cv2
+import numpy as np
 
-# Initialize embedder
-embedder = WatermarkEmbedder(
-    dwt_levels=2,
-    wavelet='db4',
-    replication_factor=100,
-    embedding_strength=0.08,
-    payload_size=128
+# Initialize semantic watermarking system
+watermark_system = SemanticWatermarkSystem(
+    delta=60.0,        # Embedding strength
+    wavelet='haar',    # Wavelet type
+    level=2           # DWT decomposition levels
 )
 
-# Embed watermark
-payload_data = {
+# Load image
+image = cv2.imread('original.jpg')
+image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+# Prepare payload
+payload = {
     'owner': 'John Doe',
     'creator': 'Jane Smith',
     'date_created': '2024-01-15',
-    'copyright': '© 2024 PixelLedger'
+    'image_id': 'img-12345'
 }
 
-watermarked_image, metadata = embedder.embed_watermark(
-    original_image, payload_data, secret_key
-)
+# Embed watermark with AI analysis
+secret_key = 'your-secret-key'
+watermarked_image, metadata = watermark_system.embed(image, payload, secret_key)
+
+# Metadata includes:
+# - AI-generated caption (BLIP)
+# - Detected objects with confidence (ResNet)
+# - Semantic hash (SHA256 of semantic content)
+# - Perceptual hash (visual fingerprint)
+# - Multi-layer cryptographic fingerprint
+# - Blockchain-ready payload
+# - PSNR quality metric
 
 # Extract watermark
-extractor = WatermarkExtractor()
-results = extractor.extract_with_geometric_correction(
-    watermarked_image, secret_key, original_image
-)
-```
+extraction_result = watermark_system.extract(watermarked_image, secret_key)
 
-### Demo Notebook
-
-Run the interactive demo:
-```bash
-jupyter notebook demo.ipynb
+if extraction_result['success']:
+    print("Extracted payload:", extraction_result['payload'])
+    print("Semantic hash:", extraction_result['payload']['semantic_hash'])
+    print("Master fingerprint:", extraction_result['payload']['master_fingerprint'])
 ```
 
 ## API Endpoints
@@ -182,11 +241,11 @@ jupyter notebook demo.ipynb
 | Parameter | Default Value | Description |
 |-----------|---------------|-------------|
 | DWT Levels | 2 | Number of wavelet decomposition levels |
-| Wavelet | db4 | Daubechies-4 wavelet basis |
-| Replication Factor | 100 | Number of replications per bit |
-| Embedding Strength | 0.08 | Watermark embedding strength |
-| Payload Size | 128 bits | Size of embedded data |
-| ECC Codes | BCH(255,127) | Error-correcting code parameters |
+| Wavelet | haar | Haar wavelet basis |
+| Delta (Embedding Strength) | 60.0 | Quantization step size for embedding |
+| Payload Size | ~120 chars | Embedded text payload (owner, image_id, date, hashes) |
+| Hash Size | 16 chars | Truncated hash sizes for reliable embedding |
+| AI Models | BLIP, ResNet-50 | Semantic analysis models |
 
 ## Performance Metrics
 
@@ -230,29 +289,49 @@ The system provides comprehensive evaluation metrics:
 
 ### Common Issues
 
-1. **Import Errors**
-   ```bash
-   # Ensure you're in the correct directory
-   cd backend
-   python -c "import watermark_embed"
-   ```
+1. **Page Resets After Watermarking**
+   - **Cause**: Live Server auto-refresh
+   - **Solution**: Use Python HTTP server instead:
+     ```bash
+     cd frontend
+     python -m http.server 8080
+     ```
+   - Or disable Live Server auto-refresh in VS Code settings
 
-2. **Database Errors**
-   ```bash
-   # Delete the database file and restart
-   rm pixelledger.db
-   python app.py
-   ```
+2. **CORS Errors**
+   - **Error**: "Access to fetch... has been blocked by CORS policy"
+   - **Solution**: Ensure CORS origins in `backend/app.py` include your frontend URL:
+     ```python
+     origins=['http://localhost:8080', 'http://127.0.0.1:8080', ...]
+     ```
+   - Restart backend after changes
 
-3. **Frontend Not Loading**
-   - Check if backend is running on port 5000
-   - Verify API_BASE_URL in frontend JavaScript
+3. **MongoDB Connection Failed**
+   - Check MongoDB is running: `mongod --version`
+   - Update `MONGODB_URI` in `backend/app.py`
+   - For MongoDB Atlas, ensure IP whitelist is configured
+
+4. **AI Models Not Loading**
+   - Install PyTorch: `pip install torch torchvision`
+   - Install Transformers: `pip install transformers`
+   - First run will download models (~2GB) - be patient
+   - Check disk space (need ~5GB free)
+
+5. **Watermark Extraction Loops Infinitely**
+   - **Fixed**: Backend now stops after first match
+   - Restart backend to apply fix
+
+6. **Session/Authentication Issues**
+   - Clear browser localStorage
+   - Delete cookies for localhost
+   - Re-login to get fresh JWT token
+   - Check token exists: `localStorage.getItem('pixelledger_token')`
+
+7. **Image Upload Fails**
+   - Check image format (PNG, JPG, JPEG only)
+   - Max file size: 16MB
+   - Verify all required fields are filled
    - Check browser console for errors
-
-4. **Watermark Embedding Fails**
-   - Ensure image is in supported format (PNG, JPG, JPEG)
-   - Check image size (max 16MB)
-   - Verify all required metadata fields are provided
 
 ### Performance Optimization
 
@@ -311,11 +390,12 @@ For support and questions:
 
 ## Version History
 
-- **v1.0.0** - Initial release with core watermarking functionality
-- **v1.1.0** - Added geometric correction and web interface
-- **v1.2.0** - Enhanced robustness and performance optimization
-- **v1.3.0** - MongoDB integration for scalable user management
-- **v2.0.0** - Blockchain integration for immutable hash verification (Planned)
+- **v1.0.0** - Initial release with core DWT watermarking functionality
+- **v1.1.0** - Added web interface and user authentication
+- **v1.2.0** - Enhanced robustness and MongoDB integration
+- **v1.3.0** - Semantic watermarking with AI (BLIP + ResNet)
+- **v1.4.0** - Cryptographic fingerprinting and multi-layer hashing (Current)
+- **v2.0.0** - Blockchain integration for immutable hash verification (Planned Q4 2024)
 
 ---
 
