@@ -17,7 +17,31 @@
             font-family: 'Inter', sans-serif;
             line-height: 1.6;
             color: #333;
-            background: #f5faf5;
+            background: #e8f4f8;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background blobs */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 20% 80%, rgba(52, 152, 219, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(41, 128, 185, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 40%, rgba(93, 173, 226, 0.08) 0%, transparent 50%);
+            animation: blobMove 30s ease-in-out infinite;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        @keyframes blobMove {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -50px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
         }
 
         .container {
@@ -36,6 +60,14 @@
             z-index: 1000;
             border-bottom: 1px solid #e1e8ed;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+
+        header.scrolled {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
 
         nav {
@@ -62,10 +94,29 @@
             text-decoration: none;
             font-weight: 500;
             font-size: 0.95rem;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 50%;
+            background: #3498db;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
         }
 
         .nav-links a:hover {
             color: #3498db;
+            transform: translateY(-2px);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
         }
 
         .auth-buttons {
@@ -82,26 +133,51 @@
             display: inline-block;
             cursor: pointer;
             font-size: 0.9rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
         }
 
         .btn-primary {
             background: #3498db;
             color: white;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
         }
 
         .btn-primary:hover {
             background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
         }
 
         .btn-secondary {
             background: transparent;
             color: white;
             border: 2px solid white;
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
         }
 
         .btn-secondary:hover {
             background: white;
             color: #2c3e50;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3);
         }
 
         /* Hero Section */
@@ -116,15 +192,80 @@
             align-items: center;
             justify-content: center;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(52, 152, 219, 0.1), rgba(155, 89, 182, 0.1));
+            animation: heroGradient 8s ease-in-out infinite;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            animation: grainMove 20s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes heroGradient {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        @keyframes grainMove {
+            0% { transform: translateX(0) translateY(0); }
+            100% { transform: translateX(-100px) translateY(-100px); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            animation: fadeInUp 1s ease-out;
         }
 
         .hero-content h1 {
             font-size: 4rem;
-            font-weight: 700;
+            font-weight: 900;
+            font-style: italic;
             color: white;
             margin-bottom: 1rem;
             line-height: 1.2;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            animation: slideInDown 1s ease-out 0.3s both;
+            position: relative;
+            display: inline-block;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            letter-spacing: 2px;
+            transform: skewX(-3deg);
+        }
+
+        .hero-content h1::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -10px;
+            right: -10px;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: textShimmer 3s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes textShimmer {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
         }
 
         .hero-content p {
@@ -133,6 +274,7 @@
             margin-bottom: 2rem;
             font-weight: 500;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            animation: slideInUp 1s ease-out 0.6s both;
         }
 
         .hero-content .subtitle {
@@ -140,6 +282,49 @@
             color: rgba(255, 255, 255, 0.9);
             margin-bottom: 3rem;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 1s ease-out 0.9s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
         }
 
         .hero-buttons {
@@ -147,6 +332,7 @@
             gap: 1rem;
             justify-content: center;
             flex-wrap: wrap;
+            animation: slideInUp 1s ease-out 1.2s both;
         }
 
         .btn-large {
@@ -155,7 +341,262 @@
             border-radius: 8px;
         }
 
+        /* Works Section */
+        .works-section {
+            background: #f8f9fa;
+            padding: 80px 0;
+            position: relative;
+            overflow: hidden;
+        }
 
+        .works-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -50%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(52, 152, 219, 0.02), transparent);
+            animation: backgroundMove 20s linear infinite;
+        }
+
+        @keyframes backgroundMove {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .works-header {
+            text-align: center;
+            margin-bottom: 4rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .works-header h2 {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-weight: 700;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .works-header p {
+            color: #666;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        .works-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .work-item {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+            transform: translateY(50px);
+            animation: slideInUp 0.8s ease-out forwards;
+            position: relative;
+        }
+
+        .work-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(52, 152, 219, 0.05), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .work-item:hover::before {
+            opacity: 1;
+        }
+
+        .work-item:nth-child(1) { animation-delay: 0.1s; }
+        .work-item:nth-child(2) { animation-delay: 0.2s; }
+        .work-item:nth-child(3) { animation-delay: 0.3s; }
+        .work-item:nth-child(4) { animation-delay: 0.4s; }
+        .work-item:nth-child(5) { animation-delay: 0.5s; }
+        .work-item:nth-child(6) { animation-delay: 0.6s; }
+
+        .work-item:hover {
+            transform: translateY(-10px) scale(1.02) rotateY(5deg);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .work-item:hover .work-image {
+            transform: perspective(1000px) rotateX(5deg);
+        }
+
+        .work-image {
+            position: relative;
+            overflow: hidden;
+            height: 250px;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .work-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .work-item:hover .work-image img {
+            transform: scale(1.1) rotate(2deg) brightness(1.1);
+            filter: contrast(1.1) saturate(1.2);
+        }
+
+        .work-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(52, 152, 219, 0.9), rgba(155, 89, 182, 0.9));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: scale(0.8) rotateY(180deg);
+            backdrop-filter: blur(5px);
+        }
+
+        .work-item:hover .work-overlay {
+            opacity: 1;
+            transform: scale(1) rotateY(0deg);
+        }
+
+        .work-info {
+            text-align: center;
+            color: white;
+            padding: 1rem;
+            transform: translateY(20px);
+            transition: transform 0.3s ease 0.1s;
+        }
+
+        .work-item:hover .work-info {
+            transform: translateY(0);
+        }
+
+        .work-info h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .work-info p {
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .work-tags {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            transform: scale(0.9);
+        }
+
+        .work-item:hover .tag {
+            transform: scale(1);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .works-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        .stat-item:nth-child(1) { animation-delay: 0.7s; }
+        .stat-item:nth-child(2) { animation-delay: 0.8s; }
+        .stat-item:nth-child(3) { animation-delay: 0.9s; }
+
+        .stat-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #3498db;
+            margin-bottom: 0.5rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .stat-number::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(45deg, #3498db, #9b59b6);
+            transition: width 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .stat-item:hover .stat-number::after {
+            width: 100%;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .stat-item:hover .stat-label {
+            color: #3498db;
+        }
 
         /* About Section */
         .about-section {
@@ -180,6 +621,7 @@
             color: #666;
             line-height: 1.7;
             margin-bottom: 1rem;
+            text-align: justify;
         }
 
         .about-images {
@@ -237,24 +679,64 @@
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             text-align: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(52, 152, 219, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .feature-card:hover::before {
+            left: 100%;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
         }
 
         .feature-icon {
             font-size: 2.5rem;
             color: #e74c3c;
             margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.2) rotate(10deg);
+            color: #3498db;
         }
 
         .feature-card h3 {
             color: #2c3e50;
             margin-bottom: 1rem;
             font-size: 1.1rem;
+            transition: color 0.3s ease;
+        }
+
+        .feature-card:hover h3 {
+            color: #3498db;
         }
 
         .feature-card p {
             color: #666;
             font-size: 0.9rem;
             line-height: 1.6;
+            transition: color 0.3s ease;
+        }
+
+        .feature-card:hover p {
+            color: #555;
         }
 
         /* Footer */
@@ -333,6 +815,14 @@
                 grid-template-columns: repeat(2, 1fr);
             }
 
+            .works-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .works-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
             .footer-nav {
                 gap: 1rem;
             }
@@ -341,6 +831,14 @@
 
         @media (max-width: 480px) {
             .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .works-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .works-stats {
                 grid-template-columns: 1fr;
             }
 
@@ -390,7 +888,128 @@
         </div>
     </section>
 
+    <!-- Works Section -->
+    <section class="works-section" id="works">
+        <div class="container">
+            <div class="works-header">
+                <h2>Our Works</h2>
+                <p>Explore some of the digital artworks we've protected with our advanced watermarking technology</p>
+            </div>
+            
+            <div class="works-grid">
+                <div class="work-item">
+                    <div class="work-image">
+                        <img src="images/naturephoto1.jpg" alt="Nature Photography">
+                        <div class="work-overlay">
+                            <div class="work-info">
+                                <h3>Nature Photography</h3>
+                                <p>Professional landscape photography protected with invisible watermarks</p>
+                                <div class="work-tags">
+                                    <span class="tag">Photography</span>
+                                    <span class="tag">Nature</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="work-item">
+                    <div class="work-image">
+                        <img src="images/digital1.jpg" alt="Digital Illustration 1">
+                        <div class="work-overlay">
+                            <div class="work-info">
+                                <h3>Digital Illustration</h3>
+                                <p>Creative digital artwork secured with semantic watermarking</p>
+                                <div class="work-tags">
+                                    <span class="tag">Digital Art</span>
+                                    <span class="tag">Illustration</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
+                <div class="work-item">
+                    <div class="work-image">
+                        <img src="images/digital2.jpg" alt="Digital Illustration 2">
+                        <div class="work-overlay">
+                            <div class="work-info">
+                                <h3>Digital Illustration</h3>
+                                <p>Creative digital artwork secured with semantic watermarking</p>
+                                <div class="work-tags">
+                                    <span class="tag">Digital Art</span>
+                                    <span class="tag">Illustration</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="work-item">
+                    <div class="work-image">
+                        <img src="images/digital3.jpg" alt="Digital Illustration 3">
+                        <div class="work-overlay">
+                            <div class="work-info">
+                                <h3>Digital Illustration</h3>
+                                <p>Creative digital artwork secured with semantic watermarking</p>
+                                <div class="work-tags">
+                                    <span class="tag">Digital Art</span>
+                                    <span class="tag">Illustration</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="work-item">
+                    <div class="work-image">
+                        <img src="images/abstractart.jpg" alt="Abstract Art">
+                        <div class="work-overlay">
+                            <div class="work-info">
+                                <h3>Abstract Art</h3>
+                                <p>Modern abstract composition with blockchain verification</p>
+                                <div class="work-tags">
+                                    <span class="tag">Abstract</span>
+                                    <span class="tag">Modern</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="work-item">
+                    <div class="work-image">
+                        <img src="images/portrait1.jpg" alt="Portrait Photography">
+                        <div class="work-overlay">
+                            <div class="work-info">
+                                <h3>Portrait Photography</h3>
+                                <p>Professional portrait with advanced watermark protection</p>
+                                <div class="work-tags">
+                                    <span class="tag">Portrait</span>
+                                    <span class="tag">Professional</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="works-stats">
+                <div class="stat-item">
+                    <div class="stat-number">100+</div>
+                    <div class="stat-label">Artworks Protected</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">99.9%</div>
+                    <div class="stat-label">Verification Accuracy</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Protection Active</div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- About Section -->
     <section class="about-section" id="about">
@@ -490,6 +1109,148 @@
                     });
                 }
             });
+        });
+
+        // Header scroll effect
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Intersection Observer for scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements for scroll animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const animatedElements = document.querySelectorAll('.work-item, .stat-item, .feature-card');
+            animatedElements.forEach(el => {
+                observer.observe(el);
+            });
+        });
+
+        // Add floating animation to hero content
+        document.addEventListener('DOMContentLoaded', function() {
+            const heroContent = document.querySelector('.hero-content');
+            if (heroContent) {
+                setInterval(() => {
+                    heroContent.style.transform = 'translateY(-5px)';
+                    setTimeout(() => {
+                        heroContent.style.transform = 'translateY(0)';
+                    }, 2000);
+                }, 4000);
+            }
+        });
+
+        // Add pulse animation to buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(btn => {
+                btn.addEventListener('mouseenter', function() {
+                    this.style.animation = 'pulse 0.6s ease-in-out';
+                });
+                btn.addEventListener('animationend', function() {
+                    this.style.animation = '';
+                });
+            });
+        });
+
+        // Add CSS for pulse animation and floating particles
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+                100% { transform: scale(1); }
+            }
+            
+            @keyframes float {
+                0%, 100% { transform: translateY(0px) rotate(0deg); }
+                50% { transform: translateY(-20px) rotate(180deg); }
+            }
+            
+            @keyframes glow {
+                0%, 100% { box-shadow: 0 0 5px rgba(52, 152, 219, 0.3); }
+                50% { box-shadow: 0 0 20px rgba(52, 152, 219, 0.6), 0 0 30px rgba(155, 89, 182, 0.4); }
+            }
+            
+            .floating-particle {
+                position: fixed;
+                width: 4px;
+                height: 4px;
+                background: rgba(52, 152, 219, 0.6);
+                border-radius: 50%;
+                pointer-events: none;
+                animation: float 6s ease-in-out infinite;
+                z-index: 1;
+            }
+            
+            .glow-effect {
+                animation: glow 2s ease-in-out infinite;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Create floating particles
+        function createFloatingParticles() {
+            const particleCount = 15;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'floating-particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 4) + 's';
+                document.body.appendChild(particle);
+            }
+        }
+
+        // Add glow effect to work items
+        function addGlowEffects() {
+            const workItems = document.querySelectorAll('.work-item');
+            workItems.forEach((item, index) => {
+                setTimeout(() => {
+                    item.classList.add('glow-effect');
+                    setTimeout(() => {
+                        item.classList.remove('glow-effect');
+                    }, 2000);
+                }, index * 500);
+            });
+        }
+
+        // Initialize effects
+        document.addEventListener('DOMContentLoaded', function() {
+            createFloatingParticles();
+            
+            // Add glow effect when works section comes into view
+            const worksSection = document.querySelector('.works-section');
+            if (worksSection) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            setTimeout(() => {
+                                addGlowEffects();
+                            }, 1000);
+                        }
+                    });
+                }, { threshold: 0.3 });
+                observer.observe(worksSection);
+            }
         });
 
     </script>

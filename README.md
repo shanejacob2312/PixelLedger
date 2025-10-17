@@ -40,7 +40,10 @@ PixelLedger is a comprehensive invisible watermarking system that uses advanced 
 - **Semantic Analysis Display**: View AI-generated captions and detected objects
 - **Cryptographic Hashes**: View embedded semantic, perceptual, and master fingerprint hashes
 - **Watermark Verification**: Upload any image to detect and extract watermarks
-- **Tamper Detection**: Identify if watermarked images have been modified
+- **Advanced Tamper Detection**: Identify if watermarked images have been modified with confidence scores
+- **Original Data Display**: Shows original database details for tampered images (not corrupted extraction)
+- **Double-Watermark Prevention**: Blocks re-watermarking of already watermarked images (clean or tampered)
+- **Ultra-Robust Extraction**: Multiple delta value strategy (20.0 to 80.0) with advanced error correction
 - **Dashboard**: Statistics, image gallery, and recent activity
 - **Responsive Design**: Works seamlessly on desktop and mobile devices
 
